@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "elevator.h"
+#include "elevatorui.h"
 
 #include <QObject>
 #include <vector>
@@ -19,9 +20,9 @@ signals:
 
 private:
     std::vector<Elevator*> elevators;
-    std::vector<MainWindow*> windows;
+    std::vector<ElevatorUI*> elevatorUIs;
     Building b;
-
+    MainWindow w;
 };
 
 #endif // CONTROLLER_H

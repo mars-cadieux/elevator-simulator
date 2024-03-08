@@ -29,6 +29,6 @@ class MainWindow : public QMainWindow
         void openDoorButtonPressed();
         void closeDoorButtonPressed();
         void on_helpButton_released();
-        void on_floor1Button_released();
+        void on_closeDoorButton_pressed();
 };
 #endif // MAINWINDOW_H

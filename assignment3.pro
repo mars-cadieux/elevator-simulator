@@ -17,6 +17,8 @@ SOURCES += \
     doorsensor.cpp \
     ecs.cpp \
     elevator.cpp \
+    elevatorbutton.cpp \
+    elevatorui.cpp \
     main.cpp \
     mainwindow.cpp \
     test.cpp
@@ -31,6 +33,8 @@ HEADERS += \
     doorsensor.h \
     ecs.h \
     elevator.h \
+    elevatorbutton.h \
+    elevatorui.h \
     mainwindow.h \
     test.h
 

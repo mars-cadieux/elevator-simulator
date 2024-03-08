@@ -1,6 +1,7 @@
 #include "building.h"
-#include "defs.h"
 #include "elevator.h"
+
+#include "defs.h"
 
 Building::Building(QObject *parent)
     : QObject{parent}
@@ -8,8 +9,9 @@ Building::Building(QObject *parent)
 
 }
 
-void Building::respondCall(Elevator* e){
-    if(BUILDING_RESPOND){
+void Building::respondCall(){
+    Elevator* e = qobject_cast<Elevator*>(sender());
+    if(BUILDING_RESPOND == 1){
         int eID = e->getID();
         cout<<"Building safety service connected to elevator "<<eID<<endl;
     }

@@ -1,6 +1,7 @@
 #ifndef BUILDING_H
 #define BUILDING_H
 
+
 #include <QObject>
 
 #include <iostream>
@@ -22,7 +23,7 @@ class Building : public QObject{
 
     public slots:
         //void respondCall(int eID);
-        void respondCall(Elevator* e);
+        void respondCall();
 
     private:
 };

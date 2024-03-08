@@ -8,7 +8,7 @@
 #include "doorsensor.h"
 #include "building.h"
 //#include "FloorSensor.h"
-//#include "ElevatorUI.h"
+#include "elevatorui.h"
 //#include "ecs.h"
 
 #include <iostream>
@@ -39,8 +39,10 @@ class Elevator : public QObject {
 
         void updateFloor(int currentFloor); //updates currentFloor
 
-        void addStop(int floor); //adds floor number to array of stops
+
         void removeStop(int floor); //removes stop from array of stops (used on arrival at floors and in emergency situations)
+
+        void showUI();
 
         void call911();
 
@@ -50,16 +52,21 @@ class Elevator : public QObject {
         bool obstructedStop();
         bool overloadStop();
 
+
+
     signals:
         void stop();
         //void callBuilding(int eID);
-        void callBuilding(Elevator* e);
+        void callBuilding();
 
     public slots:
         void openDoor();
         void closeDoor();
         void callForHelp();
         //void call911(int eID);
+        //void addStop();
+        void addStop(); //adds floor number to array of stops
+
 
     private:
         string state; //moving up, moving down, idle, stopped, boarding, overload stopped, obstructed stopped
@@ -69,11 +76,11 @@ class Elevator : public QObject {
         int currentFloor;
         int* stops; //dynamic array with size equal to number of floors
 
-        //ElevatorUI elevatorUI;
+        ElevatorUI* elevatorUI;
         Door* door;
         //WeightSensor weightSensor;
         DoorSensor* doorSensor;
-       // FloorSensor floorSensor;
+        //FloorSensor floorSensor;
         Building* building; //pointer to the building that contains the elevator
 
         //ECS* observer;
