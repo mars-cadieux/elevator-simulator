@@ -17,6 +17,8 @@ public:
     //ElevatorUI(Elevator* owner);
     ~ElevatorUI();
 
+    friend class Elevator;
+
 signals:
 
 public slots:
@@ -28,6 +30,8 @@ private:
     QPushButton* closeDoorButton;
     QPushButton* helpButton;
     Elevator* owner;        //pointer to the elevator that "owns" this UI
+    void blockAllSignals();
+    void unblockAllSignals();
 };
 
 #endif // ELEVATORUI_H

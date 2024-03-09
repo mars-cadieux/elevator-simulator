@@ -2,6 +2,7 @@
 #define ECS_H
 
 #include <QObject>
+#include <QTimer>
 
 //#include "FloorButton.h"
 #include "elevator.h"
@@ -37,6 +38,9 @@ class ECS :  public QObject{
 
         //vector<FloorButton*> floorRequests; 	//storing FloorButton pointers instead of making a FloorRequest object/class and storing those, since my FloorRequest object would just have a floorNum (int) and a direction (string), which the FloorButton already has.
         vector<Elevator*> availableElevators;
+        QTimer timer;
+
+        void reset();
         //Building* building; //pointer to the building
 };
 

@@ -52,24 +52,38 @@ Door *Elevator::getDoor() const
     return door;
 }
 
-//adds a 1 second delay between floor movement so simulation is a bit more realistic
-void Elevator::delay()
+//adds a 1 second delay between floor movement so the simulation is a bit more realistic
+void Elevator::delay(int seconds)
 {
-    QTime dieTime= QTime::currentTime().addSecs(1);
+    QTime dieTime= QTime::currentTime().addSecs(seconds);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
+void Elevator::blockAllSignals()
+{
+    this->blockSignals(true);
+    elevatorUI->blockAllSignals();
+}
+
+void Elevator::unblockAllSignals()
+{
+    this->blockSignals(false);
+    elevatorUI->unblockAllSignals();
 }
 
 void Elevator::travel(const string &direction)
 {
     setState("travelling");
     if(direction == "up"){
-        delay();
+        travelDirection = "up";
+        delay(1);
         updateFloor(++currentFloor);
         emit newFloor();
     }
     else if(direction == "down"){
-        delay();
+        travelDirection = "down";
+        delay(1);
         updateFloor(--currentFloor);
         emit newFloor();
     }
@@ -88,10 +102,49 @@ void Elevator::removeAllStops()
     }
 }
 
-void Elevator::emergencyStop(const string &msg)
+void Elevator::emergency(const string &msg)
 {
+    //this->blockSignals(true);
     display->updateDisplay(msg);
     audioSystem->setMessage(msg);
+
+    //stops.push_back(currentFloor);
+
+    //
+    //stops.pop_front();
+    //delay();
+
+    if(state == "travelling"){
+        if(travelDirection == "up"){
+            stops.push_back(currentFloor+1);
+        }
+        else if(travelDirection == "down"){
+            stops.push_back(currentFloor-1);
+        }
+    }
+    else{
+        stops.push_back(currentFloor);
+        emit stopAdded();
+    }
+    setState("emergency");
+
+//
+}
+
+void Elevator::emergencyStop()
+{
+    stops.pop_front();
+    setState("emergency stopped");
+    travelDirection = "";
+    ringBell();
+    display->updateDisplay("Safe floor reached. Please disembark.");
+    audioSystem->setMessage("We have reached the safe floor. Please disembark as soon as possible.");
+    door->open();
+
+    //pause the elevator for 10 seconds, then return the simulation back to normal
+    blockAllSignals();
+    cout<<"10 seconds until simulation returns to normal"<<endl;
+    //the ECS starts the 10 second timer
 }
 
 
@@ -109,6 +162,7 @@ void Elevator::board()
 {
     stops.pop_front();
     setState("boarding");
+    travelDirection = "";
     ringBell();
     openDoor();
 }
@@ -144,7 +198,7 @@ void Elevator::callForHelp()
     emit callBuilding();
 }
 
-//this slot catches signals emitted when an elevatorr button is pressed
+//this slot catches signals emitted when an elevator button is pressed
 void Elevator::addStop()
 {
     ElevatorButton* eButton = qobject_cast<ElevatorButton*>(sender());

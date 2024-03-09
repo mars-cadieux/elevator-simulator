@@ -69,3 +69,23 @@ void ElevatorUI::testFun()
 {
     cout<<"test"<<endl;
 }
+
+void ElevatorUI::blockAllSignals()
+{
+    for(unsigned int i=0; i<elevatorButtons.size(); ++i){
+        elevatorButtons[i]->blockSignals(true);
+    }
+    openDoorButton->blockSignals(true);
+    closeDoorButton->blockSignals(true);
+    helpButton->blockSignals(true);
+}
+
+void ElevatorUI::unblockAllSignals()
+{
+    for(unsigned int i=0; i<elevatorButtons.size(); ++i){
+        elevatorButtons[i]->blockSignals(false);
+    }
+    openDoorButton->blockSignals(false);
+    closeDoorButton->blockSignals(false);
+    helpButton->blockSignals(false);
+}

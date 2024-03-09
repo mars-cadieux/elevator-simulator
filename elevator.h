@@ -19,6 +19,8 @@
 #include <vector>
 #include <list>
 
+class ElevatorUI;
+
 using namespace std;
 
 class Elevator : public QObject {
@@ -45,7 +47,8 @@ class Elevator : public QObject {
 
 
         void removeAllStops(); //removes all stops in list, used in emergency situations
-        void emergencyStop(const string& msg);
+        void emergency(const string& msg);
+        void emergencyStop();
 
         void showUI();
 
@@ -59,6 +62,7 @@ class Elevator : public QObject {
 
         void board();
 
+        friend class ECS;
 
 
     signals:
@@ -83,6 +87,7 @@ class Elevator : public QObject {
         const int id;
         static int nextID;
         string state; //moving up, moving down, idle, stopped, boarding, overload stopped, obstructed stopped
+        string travelDirection;
         float weightLimit;
         int currentFloor;
         std::list<int> stops;
@@ -98,7 +103,9 @@ class Elevator : public QObject {
 
         QTimer doorTimer;   //timer to close the door after 10 seconds
 
-        void delay();       //fucntion to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
+        void delay(int seconds);       //fucntion to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
+        void blockAllSignals();
+        void unblockAllSignals();
 
         //ECS* observer;
 };

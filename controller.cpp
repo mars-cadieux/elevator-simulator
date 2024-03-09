@@ -14,12 +14,12 @@ Controller::Controller(QObject *parent)
 
 Controller::~Controller()
 {
-    for(int i=0; i<elevators.size(); ++i){
+    for(unsigned int i=0; i<elevators.size(); ++i){
         delete elevators[i];
     }
     elevators.clear();
 
-    for(int i=0; i<elevatorUIs.size(); ++i){
+    for(unsigned int i=0; i<elevatorUIs.size(); ++i){
         delete elevatorUIs[i];
     }
     elevatorUIs.clear();
