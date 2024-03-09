@@ -6,17 +6,20 @@
 #include <vector>
 #include <iomanip>
 
+class Elevator;
+
 using namespace std;
 
 class AudioSystem {
     public:
-        AudioSystem(); //constructor
+        AudioSystem(Elevator* e); //constructor
         ~AudioSystem(); //destructor
 
         void setMessage(const string& msg);
 
     private:
         string currentMessage;
+        Elevator* owner;        //pointer to the elevator that "owns" this audio system
 };
 
 #endif

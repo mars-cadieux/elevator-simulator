@@ -31,6 +31,7 @@ void Controller::launch()
     for(int i=0; i<NUM_ELEVATORS; ++i){
         Elevator* e = new Elevator();
         elevators.push_back(e);
+        ecs.addElevator(e);
         e->showUI();
 
 
@@ -70,6 +71,9 @@ void Controller::launch()
 
 //        windows[i]->show();
 //    }
+
+    QObject::connect(&w, &MainWindow::powerOut, &ecs, &ECS::powerOut, Qt::QueuedConnection);
+    QObject::connect(&w, &MainWindow::fire, &ecs, &ECS::fire, Qt::QueuedConnection);
 
     w.show();
 }

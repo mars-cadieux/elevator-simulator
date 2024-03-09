@@ -23,8 +23,12 @@ class ECS :  public QObject{
         void takeRequest();
         void allocateRequest();		//Gives the request to the first elevator in the availableElevators vector. if the availableElevators vector is empty, check if any moving elevators can accommodate the request as a stop between their current floor and their destination
         void update();
+
+        void addElevator(Elevator* e);
     signals:
     public slots:
+        void powerOut();
+        void fire();
     private:
         //vector<FloorButton*> floorButtons;
         vector<Elevator*> elevators;

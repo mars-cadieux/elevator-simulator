@@ -1,13 +1,29 @@
 #include "door.h"
 
-Door::Door(int eID): elevatorID(eID){}
+Door::Door(int eID): elevatorID(eID), state("closed"){
+
+}
 
 void Door::open(){
-    cout<<"Elevator "<<elevatorID<<" door opening"<<endl;
-
-    //TODO: QElapsedTimer for 10 sec delay then close door
+    if(state != "open"){
+        cout<<"Elevator "<<elevatorID<<" door opening. ";
+    }
+    setState("open");
 }
 
 void Door::close(){
-    cout<<"Elevator "<<elevatorID<<" door closing"<<endl;
+    if(state != "closed"){
+        cout<<"Elevator "<<elevatorID<<" door closing."<<endl;
+    }
+    setState("closed");
+}
+
+void Door::setState(const string &s)
+{
+    state = s;
+}
+
+const string &Door::getState() const
+{
+    return state;
 }

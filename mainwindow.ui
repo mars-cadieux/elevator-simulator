@@ -14,72 +14,30 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="powerOutButton">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>220</y>
-      <width>241</width>
-      <height>151</height>
+      <x>320</x>
+      <y>200</y>
+      <width>101</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
     <property name="text">
-     <string>CLick me</string>
+     <string>Power Out</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="openDoorButton">
+   <widget class="QPushButton" name="fireButton">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>350</y>
-      <width>83</width>
-      <height>25</height>
+      <x>320</x>
+      <y>250</y>
+      <width>101</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;|&gt;</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="closeDoorButton">
-    <property name="geometry">
-     <rect>
-      <x>650</x>
-      <y>350</y>
-      <width>83</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&gt;|&lt;</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="helpButton">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>350</y>
-      <width>83</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Help</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="floor1Button">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>220</y>
-      <width>83</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>1</string>
+     <string>Fire</string>
     </property>
    </widget>
   </widget>

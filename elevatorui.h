@@ -27,7 +27,7 @@ private:
     QPushButton* openDoorButton;
     QPushButton* closeDoorButton;
     QPushButton* helpButton;
-    Elevator* owner;
+    Elevator* owner;        //pointer to the elevator that "owns" this UI
 };
 
 #endif // ELEVATORUI_H

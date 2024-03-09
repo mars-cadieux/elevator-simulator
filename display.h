@@ -6,17 +6,21 @@
 #include <vector>
 #include <iomanip>
 
+class Elevator;
+
 using namespace std;
 
 class Display {
     public:
-        Display(); //constructor
+        Display(Elevator* e); //constructor
         ~Display(); //destructor
 
         void updateDisplay(const string& message);
+        void updateDisplay(int floorNum);
 
     private:
         string currentMessage;
+        Elevator* owner;
 };
 
 #endif

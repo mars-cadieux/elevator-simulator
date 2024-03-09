@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "elevator.h"
 #include "elevatorui.h"
+#include "ecs.h"
 
 #include <QObject>
 #include <vector>
@@ -23,6 +24,7 @@ private:
     std::vector<ElevatorUI*> elevatorUIs;
     Building b;
     MainWindow w;
+    ECS ecs;
 };
 
 #endif // CONTROLLER_H

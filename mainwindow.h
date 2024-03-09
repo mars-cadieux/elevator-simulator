@@ -19,16 +19,11 @@ class MainWindow : public QMainWindow
         Ui::MainWindow *ui;
 
     signals:
-        void openDoorSignal();
-        void closeDoorSignal();
-        void helpSignal();
-        void destFloorSignal(int floorNum);
+        void powerOut();
+        void fire();
 
     private slots:
-        void doSomething();
-        void openDoorButtonPressed();
-        void closeDoorButtonPressed();
-        void on_helpButton_released();
-        void on_closeDoorButton_pressed();
+        void on_powerOutButton_released();
+        void on_fireButton_released();
 };
 #endif // MAINWINDOW_H

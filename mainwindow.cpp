@@ -9,15 +9,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 
-
-
-
     ui->setupUi(this);
 
 
-    connect(ui->pushButton, SIGNAL(released()), this, SLOT (doSomething()));
-    connect(ui->openDoorButton, SIGNAL(released()), this, SLOT (openDoorButtonPressed()));
-    connect(ui->closeDoorButton, SIGNAL(released()), this, SLOT (closeDoorButtonPressed()));
+    //connect(ui->pushButton, SIGNAL(released()), this, SLOT (doSomething()));
+
 }
 
 MainWindow::~MainWindow()
@@ -25,24 +21,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::doSomething() {
-    qInfo("hello world");
-}
 
-void MainWindow::openDoorButtonPressed() {
-    emit openDoorSignal();
-}
-
-void MainWindow::closeDoorButtonPressed() {
-    emit closeDoorSignal();
-}
-
-void MainWindow::on_helpButton_released()
+void MainWindow::on_powerOutButton_released()
 {
-    emit helpSignal();
+    emit powerOut();
 }
 
-void MainWindow::on_closeDoorButton_pressed(){
-
+void MainWindow::on_fireButton_released()
+{
+    emit fire();
 }
 

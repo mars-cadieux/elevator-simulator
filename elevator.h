@@ -2,11 +2,14 @@
 #define ELEVATOR_H
 
 #include <QObject>
+#include <QTimer>
 
 #include "door.h"
 //#include "WeightSensor.h"
 #include "doorsensor.h"
 #include "building.h"
+#include "display.h"
+#include "audiosystem.h"
 //#include "FloorSensor.h"
 #include "elevatorui.h"
 //#include "ecs.h"
@@ -14,7 +17,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <iomanip>
+#include <list>
 
 using namespace std;
 
@@ -28,6 +31,7 @@ class Elevator : public QObject {
         int getCurrentFloor() const;
         const string& getState() const;
         int getID() const;
+
         void setState(const string& state);
         int* getStops() const;
         Door* getDoor();
@@ -52,6 +56,8 @@ class Elevator : public QObject {
         bool obstructedStop();
         bool overloadStop();
 
+        void board();
+
 
 
     signals:
@@ -74,14 +80,19 @@ class Elevator : public QObject {
         static int nextID;
         float weightLimit;
         int currentFloor;
-        int* stops; //dynamic array with size equal to number of floors
+        std::list<int> stops; //array with size equal to number of floors
 
         ElevatorUI* elevatorUI;
         Door* door;
+        Display* display;
+        AudioSystem* audioSystem;
         //WeightSensor weightSensor;
         DoorSensor* doorSensor;
         //FloorSensor floorSensor;
         Building* building; //pointer to the building that contains the elevator
+
+        QTimer doorTimer;   //timer to close the door after 10 seconds
+        QTimer floorTimer;  //timer to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
 
         //ECS* observer;
 };
