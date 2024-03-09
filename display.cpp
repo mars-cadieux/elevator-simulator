@@ -6,6 +6,11 @@ Display::Display(Elevator* e)
     owner = e;
 }
 
+Display::~Display()
+{
+
+}
+
 void Display::updateDisplay(const string& msg){
     currentMessage = msg;
     int eID = owner->getID();

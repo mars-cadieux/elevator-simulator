@@ -33,8 +33,8 @@ class Elevator : public QObject {
         int getID() const;
 
         void setState(const string& state);
-        int* getStops() const;
-        Door* getDoor();
+        list<int> getStops() const;
+        Door* getDoor() const;
 
         //void attach(ECS* observer);
         //void detach(ECS* observer);
@@ -44,7 +44,8 @@ class Elevator : public QObject {
         void updateFloor(int currentFloor); //updates currentFloor
 
 
-        void removeStop(int floor); //removes stop from array of stops (used on arrival at floors and in emergency situations)
+        void removeAllStops(); //removes all stops in list, used in emergency situations
+        void emergencyStop(const string& msg);
 
         void showUI();
 
@@ -64,6 +65,9 @@ class Elevator : public QObject {
         void stop();
         //void callBuilding(int eID);
         void callBuilding();
+        void doorClosed();
+        void stopAdded();
+        void newFloor();
 
     public slots:
         void openDoor();
@@ -74,13 +78,14 @@ class Elevator : public QObject {
         void addStop(); //adds floor number to array of stops
 
 
+
     private:
-        string state; //moving up, moving down, idle, stopped, boarding, overload stopped, obstructed stopped
         const int id;
         static int nextID;
+        string state; //moving up, moving down, idle, stopped, boarding, overload stopped, obstructed stopped
         float weightLimit;
         int currentFloor;
-        std::list<int> stops; //array with size equal to number of floors
+        std::list<int> stops;
 
         ElevatorUI* elevatorUI;
         Door* door;
@@ -92,7 +97,8 @@ class Elevator : public QObject {
         Building* building; //pointer to the building that contains the elevator
 
         QTimer doorTimer;   //timer to close the door after 10 seconds
-        QTimer floorTimer;  //timer to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
+
+        void delay();       //fucntion to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
 
         //ECS* observer;
 };

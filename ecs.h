@@ -29,6 +29,8 @@ class ECS :  public QObject{
     public slots:
         void powerOut();
         void fire();
+        void checkStops();
+        void checkFloor();
     private:
         //vector<FloorButton*> floorButtons;
         vector<Elevator*> elevators;

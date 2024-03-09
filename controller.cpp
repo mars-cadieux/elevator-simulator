@@ -60,6 +60,9 @@ void Controller::launch()
 
         //elevatorUI->show();
         QObject::connect(&(*elevators[i]), &Elevator::callBuilding, &b, &Building::respondCall, Qt::QueuedConnection);
+        QObject::connect(&(*elevators[i]), &Elevator::doorClosed, &ecs, &ECS::checkStops, Qt::QueuedConnection);
+        QObject::connect(&(*elevators[i]), &Elevator::stopAdded, &ecs, &ECS::checkStops, Qt::QueuedConnection);
+        QObject::connect(&(*elevators[i]), &Elevator::newFloor, &ecs, &ECS::checkFloor, Qt::QueuedConnection);
     }
 
 //    for(int i=0; i<elevators.size(); ++i){

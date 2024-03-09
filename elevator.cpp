@@ -1,9 +1,12 @@
 #include "elevator.h"
 
+#include <QTime>
+#include <QCoreApplication>
+
 int Elevator::nextID = 0;
 
 Elevator::Elevator(QObject *parent)
-    : QObject{parent}, id(++nextID), currentFloor(1)
+    : QObject{parent}, id(++nextID), state("idle"), weightLimit(250.00), currentFloor(1)
 {
     door = new Door(id);
     elevatorUI = new ElevatorUI(nullptr, this);
@@ -20,6 +23,16 @@ Elevator::~Elevator(){
     delete audioSystem;
 }
 
+int Elevator::getCurrentFloor() const
+{
+    return currentFloor;
+}
+
+const string &Elevator::getState() const
+{
+    return state;
+}
+
 int Elevator::getID() const{
     return id;
 }
@@ -29,28 +42,56 @@ void Elevator::setState(const string &s)
     state = s;
 }
 
+list<int> Elevator::getStops() const
+{
+    return stops;
+}
+
+Door *Elevator::getDoor() const
+{
+    return door;
+}
+
+//adds a 1 second delay between floor movement so simulation is a bit more realistic
+void Elevator::delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
 void Elevator::travel(const string &direction)
 {
     setState("travelling");
-    int nextStop = stops.front();
     if(direction == "up"){
-        while(currentFloor<nextStop){
-            updateFloor(++currentFloor);
-        }
+        delay();
+        updateFloor(++currentFloor);
+        emit newFloor();
     }
     else if(direction == "down"){
-        while(currentFloor>nextStop){
-            updateFloor(--currentFloor);
-        }
+        delay();
+        updateFloor(--currentFloor);
+        emit newFloor();
     }
-    board();
 }
 
 void Elevator::updateFloor(int cf)
 {
-    //cout<<"in updatefloor"<<endl;
     currentFloor = cf;
     display->updateDisplay(cf);
+}
+
+void Elevator::removeAllStops()
+{
+    while(stops.size()>0){
+        stops.pop_front();
+    }
+}
+
+void Elevator::emergencyStop(const string &msg)
+{
+    display->updateDisplay(msg);
+    audioSystem->setMessage(msg);
 }
 
 
@@ -59,7 +100,8 @@ void Elevator::showUI()
     elevatorUI->show();
 }
 
-void Elevator::ringBell(){
+void Elevator::ringBell()
+{
     cout<<"Ding!"<<endl;
 }
 
@@ -91,6 +133,7 @@ void Elevator::closeDoor()
     if(door->getState() != "closed"){
         ringBell();
         door->close();
+        emit doorClosed();
     }
 }
 
@@ -101,27 +144,21 @@ void Elevator::callForHelp()
     emit callBuilding();
 }
 
-
+//this slot catches signals emitted when an elevatorr button is pressed
 void Elevator::addStop()
 {
     ElevatorButton* eButton = qobject_cast<ElevatorButton*>(sender());
     int floorNum = eButton->getFloorNum();
-    //cout<<"dest floor "<<floorNum<<endl;
+
+    //TODO: unsure if adding a stop should close the door and start the travel process, the way I have things rn makes things easier, get rid of this if I have time
     if(door->getState() == "open"){
         closeDoor();
     }
     stops.push_back(floorNum);
-
-    if(stops.front()>currentFloor){
-        travel("up");
-    }
-    else if(stops.front()< currentFloor){
-        travel("down");
-    }
-    else{
-        board();
-    }
+    emit stopAdded();
 }
+
+
 
 
 void Elevator::call911()
