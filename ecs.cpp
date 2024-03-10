@@ -13,7 +13,7 @@ void ECS::addElevator(Elevator *e)
 
 void ECS::powerOut()
 {
-    cout<<"Power outage. Starting backup  generator..."<<endl;
+    qInfo("Power outage. Starting backup  generator...");
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->removeAllStops();
         elevators[i]->emergency("There is a power outage in the building. Please disembark once we have reached a safe floor.");
@@ -24,7 +24,7 @@ void ECS::powerOut()
 
 void ECS::fire()
 {
-    cout<<"Fire in building. Beginning emergency protocol..."<<endl;
+    qInfo("Fire in building. Beginning emergency protocol...");
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->removeAllStops();
         elevators[i]->emergency("There is a fire in the building. Please disembark once we have reached a safe floor.");
@@ -66,17 +66,12 @@ void ECS::checkStops()
 }
 
 //this slot catches all signals emitted when an elevator reaches a new floor
-//this code looks very similar to checkStops(), and it is, but I couldn't just call checkStops() instead every time I reach a new floor because it was leading to doubled up calls of the function/slot
+//this code looks very similar to checkStops(), and it is, but I couldn't just call checkStops() instead every time I reach a new floor because it was leading to doubled up calls of travel()
 void ECS::checkFloor()
 {
     //cout<<"ecs checking floor"<<endl;
     Elevator* elevator = qobject_cast<Elevator*>(sender());
-    int eID = elevator->getID();
-
-
     int destFloor = elevator->getStops().front();
-
-    //cout<<"elevator "<<eID<<"dest floor: "<<destFloor<<endl;
 
     if(destFloor>elevator->getCurrentFloor()){
         elevator->travel("up");
@@ -84,7 +79,7 @@ void ECS::checkFloor()
     else if(destFloor<elevator->getCurrentFloor()){
         elevator->travel("down");
     }
-    //if we are at the dest floor, stop and call board()
+    //if we are at the dest floor, stop and call board() or emergencyStop() if it'a an emergency
     else{
         if(elevator->getState() == "emergency"){
             elevator->emergencyStop();

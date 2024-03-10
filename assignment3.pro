@@ -19,6 +19,7 @@ SOURCES += \
     elevator.cpp \
     elevatorbutton.cpp \
     elevatorui.cpp \
+    floorbutton.cpp \
     main.cpp \
     mainwindow.cpp \
     test.cpp
@@ -35,6 +36,7 @@ HEADERS += \
     elevator.h \
     elevatorbutton.h \
     elevatorui.h \
+    floorbutton.h \
     mainwindow.h \
     test.h
 

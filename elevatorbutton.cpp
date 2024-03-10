@@ -1,6 +1,6 @@
 #include "elevatorbutton.h"
 
-ElevatorButton::ElevatorButton(QPushButton *parent)
+ElevatorButton::ElevatorButton(QWidget *parent)
     : QPushButton{parent}
 {
 

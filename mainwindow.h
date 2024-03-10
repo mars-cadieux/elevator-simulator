@@ -25,5 +25,6 @@ class MainWindow : public QMainWindow
     private slots:
         void on_powerOutButton_released();
         void on_fireButton_released();
+        void doSomething();
 };
 #endif // MAINWINDOW_H

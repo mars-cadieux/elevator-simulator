@@ -8,7 +8,7 @@ class ElevatorButton : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit ElevatorButton(QPushButton *parent = nullptr);
+    explicit ElevatorButton(QWidget *parent = nullptr);
     ElevatorButton(int floorNum);
 
     int getFloorNum();
