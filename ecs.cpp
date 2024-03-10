@@ -3,7 +3,17 @@
 ECS::ECS(QObject *parent)
     : QObject{parent}
 {
+    //connect the 10 second timer to the reset function so that the simulation can go back to normal after an emergency scenario
     QObject::connect(&timer, &QTimer::timeout, this, &ECS::reset);
+}
+
+ECS::~ECS()
+{
+    std::list<FloorRequest*>::iterator end = floorRequests.end();
+    for(std::list<FloorRequest*>::iterator it = floorRequests.begin(); it != end; ++it){
+        delete *it;
+    }
+    floorRequests.clear();
 }
 
 void ECS::addElevator(Elevator *e)
@@ -62,7 +72,6 @@ void ECS::checkStops()
     else{
         elevator->setState("idle");
     }
-
 }
 
 //this slot catches all signals emitted when an elevator reaches a new floor
@@ -90,6 +99,21 @@ void ECS::checkFloor()
     }
 }
 
+void ECS::receiveRequest(int floor, const string &dir)
+{
+    cout<<"floor "<<floor<<" "<<dir<<" requested"<<endl;
+
+    bool allocated = false;
+
+    for(unsigned int i=0; i<elevators.size(); ++i){
+        if(elevators[i]->getState() == "idle"){
+            FloorRequest* newRequest = new FloorRequest(floor, elevators[i]->getID());
+            floorRequests.push_back(newRequest);
+            elevators[i]->addStop()
+        }
+    }
+}
+
 void ECS::reset()
 {
     for(unsigned int i=0; i<elevators.size(); ++i){
@@ -97,4 +121,5 @@ void ECS::reset()
         elevators[i]->closeDoor();
         elevators[i]->setState("idle");
     }
+    emit simulationReset();
 }

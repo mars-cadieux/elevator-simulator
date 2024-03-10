@@ -21,7 +21,6 @@ signals:
 
 private:
     std::vector<Elevator*> elevators;
-    std::vector<ElevatorUI*> elevatorUIs;
     Building b;
     MainWindow w;
     ECS ecs;

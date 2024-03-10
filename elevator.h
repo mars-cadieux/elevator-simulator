@@ -29,40 +29,34 @@ class Elevator : public QObject {
         explicit Elevator(QObject* parent = nullptr); // Constructor
         ~Elevator(); // Destructor
 
+
         //getters and setters
         int getCurrentFloor() const;
         const string& getState() const;
         int getID() const;
+        Door* getDoor() const;
+        list<int> getStops() const;
 
         void setState(const string& state);
-        list<int> getStops() const;
-        Door* getDoor() const;
 
-        //void attach(ECS* observer);
-        //void detach(ECS* observer);
 
+        //member functions
         void travel(const string& direction);	// initiates movement of the elevator in a particular direction and says 'while currentFloor != destinationFloor: keep moving'
-
         void updateFloor(int currentFloor); //updates currentFloor
-
-
         void removeAllStops(); //removes all stops in list, used in emergency situations
         void emergency(const string& msg);
         void emergencyStop();
-
-        void showUI();
-
-        void call911();
-
+        void showUI();  //calls show() on elevatorUI object, needed since controller does not have direct access to elevatorUI object
+        void call911(); //places a 911 call if there is no response from building after callForHelp() is called
         void ringBell();
-        void notify();
-
-        bool obstructedStop();
-        bool overloadStop();
-
+        //bool obstructedStop();
+        //bool overloadStop();
         void board();
+        void printStops();
+        void addStopAsc(int f);
+        void addStopDesc(int f);
 
-        friend class ECS;
+        friend class ECS;   //declare ECS a friend so ECS can call blockAllSignals(
 
 
     signals:
@@ -77,17 +71,13 @@ class Elevator : public QObject {
         void openDoor();
         void closeDoor();
         void callForHelp();
-        //void call911(int eID);
-        //void addStop();
-        void addStop(); //adds floor number to array of stops
-
-
+        void addStop();
 
     private:
         const int id;
         static int nextID;
-        string state; //moving up, moving down, idle, stopped, boarding, overload stopped, obstructed stopped
-        string travelDirection;
+        string state;               //travelling, idle, boarding, emergency, overload stopped, obstructed stopped
+        string travelDirection;     //up, down
         float weightLimit;
         int currentFloor;
         std::list<int> stops;
@@ -103,11 +93,10 @@ class Elevator : public QObject {
 
         QTimer doorTimer;   //timer to close the door after 10 seconds
 
-        void delay(int seconds);       //fucntion to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
-        void blockAllSignals();
-        void unblockAllSignals();
+        void delay(int seconds);       //function to add a 1 second delay between movement across floors, so the elevator doesn't travel at the speed of light
+        void blockAllSignals();         //blocks all signals from elevator and its UI (buttons, etc). used in emergency scenarios
+        void unblockAllSignals();       //unblocks all signals from elevator and its UI, called when the simulation goes back to normal
 
-        //ECS* observer;
 };
 
 #endif

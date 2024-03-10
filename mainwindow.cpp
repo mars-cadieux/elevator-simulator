@@ -16,44 +16,48 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
 
-
-
-
-
+    //create a grid layout that we will add all our buttons and widgets to
     QGridLayout *layout = new QGridLayout;
+    widgets.push_back(layout);
 
-
+    //set up the UI , needs to be done before we can start adding things to our layout
     ui->setupUi(this);
 
     layout->setColumnMinimumWidth(1, 10);
 
+    //generate the floors and their floor buttons, these will be added to the GUI in reverse order so floor 7 is at the top (row 0) and floor 1 is at the bottom (row 6)
+    //this GUI is dynamic, so the number of floors can be changed and it will still generate everything needed for each floor
     for(int i=1; i<=NUM_FLOORS; ++i){
 
+        //generate a label for each floor with the floor number
         QLabel* floorLabel = new QLabel(this);
+        labels.push_back(floorLabel);
         floorLabel->setText(QString::number(i));
         layout->addWidget(floorLabel, 3*(NUM_FLOORS -i)+1, 0, 2, 1, Qt::AlignRight);
 
+        //generate the "up" button for each floor except the final floor
         if(i != NUM_FLOORS){
             FloorButton* upButton = new FloorButton(this, i, "up");
-            upButton->setFixedWidth(30);
+            buttons.push_back(upButton);
             layout->addWidget(upButton, 3*(NUM_FLOORS -i)+1, 1);
-            //upButton->show();
-            connect(upButton, SIGNAL(released()), this, SLOT (doSomething()));
+            connect(upButton, SIGNAL(released()), this, SLOT (floorButtonReleased()));
         }
 
+        //generate the "down" button for each floor except the first floor
         if(i != 1){
             FloorButton* downButton = new FloorButton(this, i, "down");
+            buttons.push_back(downButton);
             layout->addWidget(downButton, 3*(NUM_FLOORS -i) +2, 1);
-            downButton->setFixedWidth(30);
-            //downButton->show();
-            connect(downButton, SIGNAL(released()), this, SLOT (doSomething()));
+            connect(downButton, SIGNAL(released()), this, SLOT (floorButtonReleased()));
         }
 
 
         //QSpacerItem* spacer = new QSpacerItem(10, 10);
 
+        //add a horizontal line between each set of floor buttons
         if(i != NUM_FLOORS){
             QFrame* line = new QFrame(this);
+            widgets.push_back(line);
             line->setObjectName(QString::fromUtf8("line"));
             line->setGeometry(QRect(320, 150, 118, 3));
             line->setFrameShape(QFrame::HLine);
@@ -65,12 +69,24 @@ MainWindow::MainWindow(QWidget *parent)
 
     }
 
-    QPushButton* test = new QPushButton("test");
-
+    //add the power outage button and connect it to its slot
+    QPushButton* powerOutButton = new QPushButton("Power Out");
+    buttons.push_back(powerOutButton);
     layout->setColumnMinimumWidth(2, 50);
-    layout->addWidget(test, NUM_FLOORS*3/2, 2, Qt::AlignRight);
+    layout->addWidget(powerOutButton, NUM_FLOORS*3/2, 2, Qt::AlignRight);
 
+    connect(powerOutButton, SIGNAL(released()), this, SLOT (on_powerOutButton_released()));
+
+    //add the fire button and connect it to its slot
+    QPushButton* fireButton = new QPushButton("Fire");
+    buttons.push_back(fireButton);
+    layout->addWidget(fireButton, NUM_FLOORS*3/2 + 1, 2, Qt::AlignRight);
+
+    connect(fireButton, SIGNAL(released()), this, SLOT (on_fireButton_released()));
+
+    //now add the grid layout to a new widget and set the central widget of MainWindow to this new widget
     QWidget *window = new QWidget();
+    widgets.push_back(window);
     window->setLayout(layout);
 
     setCentralWidget(window);
@@ -81,24 +97,50 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    for(unsigned int i=0; i<buttons.size(); ++i){
+        delete buttons[i];
+    }
+    buttons.clear();
+
+    for(unsigned int i=0; i<labels.size(); ++i){
+        delete labels[i];
+    }
+    labels.clear();
+
+    for(unsigned int i=0; i<widgets.size(); ++i){
+        delete widgets[i];
+    }
+    widgets.clear();
+}
+
+//unblocks all signals
+void MainWindow::resume()
+{
+    this->blockSignals(false);
 }
 
 
 void MainWindow::on_powerOutButton_released()
 {
     emit powerOut();
+    //block all signals until the ECS tells us the simulation is good to be resumed
+    this->blockSignals(true);
 }
 
 void MainWindow::on_fireButton_released()
 {
     emit fire();
+    //block all signals until the ECS tells us the simulation is good to be resumed
+    this->blockSignals(true);
 }
 
-void MainWindow::doSomething(){
+void MainWindow::floorButtonReleased(){
     //qInfo("test");
     FloorButton* fButton = qobject_cast<FloorButton*>(sender());
     int floor = fButton->getFloorNum();
     string dir = fButton->getDirection();
-    cout<<"floor "<<floor<<" "<<dir<<" requested"<<endl;
+    fButton->illuminate();
+    emit floorButtonPressed(floor, dir);
+    //cout<<"floor "<<floor<<" "<<dir<<" requested"<<endl;
 }
 

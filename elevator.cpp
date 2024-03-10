@@ -21,6 +21,7 @@ Elevator::~Elevator(){
     delete elevatorUI;
     delete display;
     delete audioSystem;
+    stops.clear();
 }
 
 int Elevator::getCurrentFloor() const
@@ -74,19 +75,25 @@ void Elevator::unblockAllSignals()
 
 void Elevator::travel(const string &direction)
 {
-    setState("travelling");
-    if(direction == "up"){
-        travelDirection = "up";
-        delay(1);
-        updateFloor(++currentFloor);
-        emit newFloor();
-    }
-    else if(direction == "down"){
-        travelDirection = "down";
-        delay(1);
-        updateFloor(--currentFloor);
-        emit newFloor();
-    }
+
+   if(door->getState() == "open"){
+       qInfo("Cannot travel while door is open.");
+   }
+   else{
+       setState("travelling");
+       if(direction == "up"){
+           travelDirection = "up";
+           delay(1);
+           updateFloor(++currentFloor);
+           emit newFloor();
+       }
+       else if(direction == "down"){
+           travelDirection = "down";
+           delay(1);
+           updateFloor(--currentFloor);
+           emit newFloor();
+       }
+   }
 }
 
 void Elevator::updateFloor(int cf)
@@ -167,6 +174,49 @@ void Elevator::board()
     openDoor();
 }
 
+//used for debugging
+void Elevator::printStops()
+{
+    string stopsString = "Elevator " + to_string(id) + " stops: ";
+
+    std::list<int>::iterator end = stops.end();
+    for(std::list<int>::iterator it = stops.begin(); it != end; ++it){
+        stopsString += to_string(*it);
+        stopsString += ", ";
+    }
+    cout<<stopsString<<endl;
+}
+
+void Elevator::addStopAsc(int f)
+{
+    if(stops.size() > 0){
+        std::list<int>::iterator end = stops.end();
+        for(std::list<int>::iterator it = stops.begin(); it != end; ++it){
+            if(f < *it){
+                stops.insert(it, f);
+            }
+        }
+    }
+    else{
+        stops.push_back(f);
+    }
+}
+
+void Elevator::addStopDesc(int f)
+{
+    if(stops.size() > 0){
+        std::list<int>::iterator end = stops.end();
+        for(std::list<int>::iterator it = stops.begin(); it != end; ++it){
+            if(f > *it){
+                stops.insert(it, f);
+            }
+        }
+    }
+    else{
+        stops.push_back(f);
+    }
+}
+
 void Elevator::openDoor()
 {
     if(state != "travelling"){
@@ -191,7 +241,7 @@ void Elevator::closeDoor()
     }
 }
 
-
+//TODO: set state, pause elevator, resume after 10 secoondss
 void Elevator::callForHelp()
 {
     cout<<"Calling building safety service..."<<endl;
@@ -208,7 +258,36 @@ void Elevator::addStop()
     if(door->getState() == "open"){
         closeDoor();
     }
-    stops.push_back(floorNum);
+
+    //if the elevator already has some stops, we might need too add the new stop in sorted order
+    if(stops.size() > 0){
+        std::list<int>::iterator end = stops.end();
+        //if a stop has been added while the elevator is moving up, and the stop is above the current floor, add that stop in sorted order
+        if(state == "travelling" && travelDirection == "up" && floorNum > currentFloor){
+            for(std::list<int>::iterator it = stops.begin(); it != end; ++it){
+                if(floorNum < *it){
+                    stops.insert(it, floorNum);
+                }
+            }
+        }
+        //same thing but for whenn a stop is added while the elevator is moving down, and the stop is below the current floor
+        else if(state == "travelling" && travelDirection == "down" && floorNum < currentFloor){
+            for(std::list<int>::iterator it = stops.begin(); it != end; ++it){
+                if(floorNum > *it){
+                    stops.insert(it, floorNum);
+                }
+            }
+        }
+        //if the new stop is not on the elevator's current trajectory, add it to the end
+        else{
+            stops.push_back(floorNum);
+        }
+    }
+    //if the elevator has no current stops add the new stop to the end
+    else{
+        stops.push_back(floorNum);
+    }
+    printStops();   //TOODO: used for debugging, delete later
     emit stopAdded();
 }
 

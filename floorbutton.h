@@ -17,6 +17,9 @@ public:
     int getFloorNum() const;
     const string& getDirection() const;
 
+    void illuminate();
+    void darken();
+
 signals:
 
 private:
