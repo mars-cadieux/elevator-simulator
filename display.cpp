@@ -4,6 +4,8 @@
 Display::Display(Elevator* e)
 {
     owner = e;
+    string fNum = to_string(e->getCurrentFloor());
+    currentMessage = "Floor " + fNum;
 }
 
 Display::~Display()

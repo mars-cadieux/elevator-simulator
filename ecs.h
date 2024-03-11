@@ -3,9 +3,12 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QThread>
 
 //#include "FloorButton.h"
 #include "elevator.h"
+#include "floorrequest.h"
+#include "ecsthread.h"
 //#include "Building.h"
 
 #include <iostream>
@@ -21,13 +24,15 @@ class ECS :  public QObject{
         explicit ECS(QObject* parent = nullptr); // Constructor
         ~ECS(); // Destructor
 
-        class FloorRequest{
-            public:
-                FloorRequest(int f, const string& dir, int id): floorNum(f), direction(dir), eID(id) {};
-                int floorNum;
-                string direction;
-                int eID;    //id of the elevator that is taking the request
-        };
+//        class FloorRequest{
+//            public:
+//                FloorRequest(int f, const string& dir, int id): floorNum(f), direction(dir), eID(id) {};
+//                int floorNum;
+//                string direction;
+//                int eID;    //id of the elevator that is taking the request
+//        };
+
+        friend class ECSThread;
 
         //void takeRequest();
         void allocateRequest();		//Gives the request to the first elevator in the availableElevators vector. if the availableElevators vector is empty, check if any moving elevators can accommodate the request as a stop between their current floor and their destination
@@ -47,6 +52,7 @@ class ECS :  public QObject{
         void checkStops();
         void checkFloor();
         void receiveRequest(int floor, const string& dir);
+        void handleResults();
 
     private:
         //vector<FloorButton*> floorButtons;
@@ -59,6 +65,7 @@ class ECS :  public QObject{
 
         void reset();       //reset the simulation to normal after an emergency. this function is private as no other class should be allowed to reset the simulation without the ECS' permission
         //Building* building; //pointer to the building
+        void addRequest(FloorRequest* r);
 };
 
 #endif

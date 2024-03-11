@@ -16,10 +16,12 @@ SOURCES += \
     door.cpp \
     doorsensor.cpp \
     ecs.cpp \
+    ecsthread.cpp \
     elevator.cpp \
     elevatorbutton.cpp \
     elevatorui.cpp \
     floorbutton.cpp \
+    floorrequest.cpp \
     main.cpp \
     mainwindow.cpp \
     test.cpp
@@ -33,10 +35,12 @@ HEADERS += \
     door.h \
     doorsensor.h \
     ecs.h \
+    ecsthread.h \
     elevator.h \
     elevatorbutton.h \
     elevatorui.h \
     floorbutton.h \
+    floorrequest.h \
     mainwindow.h \
     test.h
 
