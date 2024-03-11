@@ -94,12 +94,14 @@ void ECS::checkFloor()
             elevator->emergencyStop();
         }
         else{
-            //check to see if this stop is an elevvator completing a floor request
+            //check to see if this stop is an elevator completing a floor request
             std::list<FloorRequest*>::iterator end = floorRequests.end();
             for(std::list<FloorRequest*>::iterator it = floorRequests.begin(); it != end; ++it){
                 if((*it)->eID == elevator->getID() && (*it)->floorNum == elevator->getCurrentFloor()){
                     emit requestCompleted((*it)->floorNum, (*it)->direction);
+                    FloorRequest* yeet = *it;
                     floorRequests.erase(it);
+                    delete yeet;
                     break;
                 }
             }

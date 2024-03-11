@@ -111,6 +111,9 @@ void MainWindow::resume()
 void MainWindow::on_powerOutButton_released()
 {
     emit powerOut();
+    for(int i=0; i<floorButtons.size(); ++i){
+        floorButtons[i]->darken();
+    }
     //block all signals until the ECS tells us the simulation is good to be resumed
     this->blockSignals(true);
 }
@@ -118,6 +121,9 @@ void MainWindow::on_powerOutButton_released()
 void MainWindow::on_fireButton_released()
 {
     emit fire();
+    for(int i=0; i<floorButtons.size(); ++i){
+        floorButtons[i]->darken();
+    }
     //block all signals until the ECS tells us the simulation is good to be resumed
     this->blockSignals(true);
 }
