@@ -46,6 +46,9 @@ void Controller::launch()
 
     //connect the slots and signals for everything related to floor requests
     QObject::connect(&w, &MainWindow::floorButtonPressed, &ecs, &ECS::receiveRequest);
+    QObject::connect(&ecs, &ECS::requestReceived, &w, &MainWindow::pendingRequest);
+    QObject::connect(&ecs, &ECS::requestFailed, &w, &MainWindow::failedRequest);
+    QObject::connect(&ecs, &ECS::requestCompleted, &w, &MainWindow::completedRequest);
 
     w.show();
 }

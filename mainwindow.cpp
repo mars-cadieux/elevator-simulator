@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     //create a grid layout that we will add all our buttons and widgets to
-    QGridLayout *layout = new QGridLayout;
+    QGridLayout *layout = new QGridLayout();
     widgets.push_back(layout);
 
     //set up the UI , needs to be done before we can start adding things to our layout
@@ -31,14 +31,13 @@ MainWindow::MainWindow(QWidget *parent)
 
         //generate a label for each floor with the floor number
         QLabel* floorLabel = new QLabel(this);
-        labels.push_back(floorLabel);
         floorLabel->setText(QString::number(i));
         layout->addWidget(floorLabel, 3*(NUM_FLOORS -i)+1, 0, 2, 1, Qt::AlignRight);
 
         //generate the "up" button for each floor except the final floor
         if(i != NUM_FLOORS){
             FloorButton* upButton = new FloorButton(this, i, "up");
-            buttons.push_back(upButton);
+            floorButtons.push_back(upButton);
             layout->addWidget(upButton, 3*(NUM_FLOORS -i)+1, 1);
             connect(upButton, SIGNAL(released()), this, SLOT (floorButtonReleased()));
         }
@@ -46,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
         //generate the "down" button for each floor except the first floor
         if(i != 1){
             FloorButton* downButton = new FloorButton(this, i, "down");
-            buttons.push_back(downButton);
+            floorButtons.push_back(downButton);
             layout->addWidget(downButton, 3*(NUM_FLOORS -i) +2, 1);
             connect(downButton, SIGNAL(released()), this, SLOT (floorButtonReleased()));
         }
@@ -57,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent)
         //add a horizontal line between each set of floor buttons
         if(i != NUM_FLOORS){
             QFrame* line = new QFrame(this);
-            widgets.push_back(line);
             line->setObjectName(QString::fromUtf8("line"));
             line->setGeometry(QRect(320, 150, 118, 3));
             line->setFrameShape(QFrame::HLine);
@@ -70,23 +68,20 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     //add the power outage button and connect it to its slot
-    QPushButton* powerOutButton = new QPushButton("Power Out");
-    buttons.push_back(powerOutButton);
+    QPushButton* powerOutButton = new QPushButton("Power Out", this);
     layout->setColumnMinimumWidth(2, 50);
     layout->addWidget(powerOutButton, NUM_FLOORS*3/2, 2, Qt::AlignRight);
 
     connect(powerOutButton, SIGNAL(released()), this, SLOT (on_powerOutButton_released()));
 
     //add the fire button and connect it to its slot
-    QPushButton* fireButton = new QPushButton("Fire");
-    buttons.push_back(fireButton);
+    QPushButton* fireButton = new QPushButton("Fire", this);
     layout->addWidget(fireButton, NUM_FLOORS*3/2 + 1, 2, Qt::AlignRight);
 
     connect(fireButton, SIGNAL(released()), this, SLOT (on_fireButton_released()));
 
     //now add the grid layout to a new widget and set the central widget of MainWindow to this new widget
-    QWidget *window = new QWidget();
-    widgets.push_back(window);
+    QWidget *window = new QWidget(this);
     window->setLayout(layout);
 
     setCentralWidget(window);
@@ -96,21 +91,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-    for(unsigned int i=0; i<buttons.size(); ++i){
-        delete buttons[i];
-    }
-    buttons.clear();
-
-    for(unsigned int i=0; i<labels.size(); ++i){
-        delete labels[i];
-    }
-    labels.clear();
 
     for(unsigned int i=0; i<widgets.size(); ++i){
         delete widgets[i];
     }
     widgets.clear();
+
+    delete ui;
 }
 
 //unblocks all signals
@@ -118,6 +105,7 @@ void MainWindow::resume()
 {
     this->blockSignals(false);
 }
+
 
 
 void MainWindow::on_powerOutButton_released()
@@ -139,8 +127,43 @@ void MainWindow::floorButtonReleased(){
     FloorButton* fButton = qobject_cast<FloorButton*>(sender());
     int floor = fButton->getFloorNum();
     string dir = fButton->getDirection();
-    fButton->illuminate();
+    //fButton->illuminate();
     emit floorButtonPressed(floor, dir);
     //cout<<"floor "<<floor<<" "<<dir<<" requested"<<endl;
+}
+
+//adds a delay
+void MainWindow::delay(int seconds)
+{
+    QTime dieTime= QTime::currentTime().addSecs(seconds);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
+void MainWindow::pendingRequest(int f, const string &dir)
+{
+    for(int i=0; i<floorButtons.size(); ++i){
+        if(floorButtons[i]->getFloorNum() == f && floorButtons[i]->getDirection() == dir){
+            floorButtons[i]->illuminate();
+        }
+    }
+}
+
+//if a floor button's request has failed, it should wait 1 second then make its request again
+//we wait 1 second so we don't overload the ECS
+void MainWindow::failedRequest(int f, const std::string &dir)
+{
+    qInfo("request failed");
+    delay(1);
+    emit floorButtonPressed(f, dir);
+}
+
+void MainWindow::completedRequest(int f, const std::string &dir)
+{
+    for(int i=0; i<floorButtons.size(); ++i){
+        if(floorButtons[i]->getFloorNum() == f && floorButtons[i]->getDirection() == dir){
+            floorButtons[i]->darken();
+        }
+    }
 }
 

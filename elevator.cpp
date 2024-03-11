@@ -34,6 +34,11 @@ const string &Elevator::getState() const
     return state;
 }
 
+const string &Elevator::getTravelDirection() const
+{
+    return travelDirection;
+}
+
 int Elevator::getID() const{
     return id;
 }
@@ -187,6 +192,7 @@ void Elevator::printStops()
     cout<<stopsString<<endl;
 }
 
+//add stop in ascending order. called by ECS, not a slot
 void Elevator::addStopAsc(int f)
 {
     if(stops.size() > 0){
@@ -200,8 +206,10 @@ void Elevator::addStopAsc(int f)
     else{
         stops.push_back(f);
     }
+    emit stopAdded();
 }
 
+//add stop in descending order. called by ECS, not a slot
 void Elevator::addStopDesc(int f)
 {
     if(stops.size() > 0){
@@ -215,6 +223,7 @@ void Elevator::addStopDesc(int f)
     else{
         stops.push_back(f);
     }
+    emit stopAdded();
 }
 
 void Elevator::openDoor()

@@ -23,8 +23,9 @@ class ECS :  public QObject{
 
         class FloorRequest{
             public:
-                FloorRequest(int f, int id): floorNum(f), eID(id) {};
+                FloorRequest(int f, const string& dir, int id): floorNum(f), direction(dir), eID(id) {};
                 int floorNum;
+                string direction;
                 int eID;    //id of the elevator that is taking the request
         };
 
@@ -33,14 +34,20 @@ class ECS :  public QObject{
         void update();
 
         void addElevator(Elevator* e);
+
     signals:
         void simulationReset();     //communicates to main window that the simulation has been reset, so the main window can unblock all its signals
+        void requestReceived(int f, const string& dir);
+        void requestCompleted(int f, const string& dir);
+        void requestFailed(int f, const string& dir);
+
     public slots:
         void powerOut();
         void fire();
         void checkStops();
         void checkFloor();
-        void receiveRequest(int floor, const std::string& dir);
+        void receiveRequest(int floor, const string& dir);
+
     private:
         //vector<FloorButton*> floorButtons;
         vector<Elevator*> elevators;

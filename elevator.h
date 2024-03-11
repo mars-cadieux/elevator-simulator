@@ -33,6 +33,7 @@ class Elevator : public QObject {
         //getters and setters
         int getCurrentFloor() const;
         const string& getState() const;
+        const string& getTravelDirection() const;
         int getID() const;
         Door* getDoor() const;
         list<int> getStops() const;
@@ -53,8 +54,8 @@ class Elevator : public QObject {
         //bool overloadStop();
         void board();
         void printStops();
-        void addStopAsc(int f);
-        void addStopDesc(int f);
+        void addStopAsc(int f);     //add stop in ascending order. called by ECS when allocating floor requests, therefore not a slot
+        void addStopDesc(int f);    //add stop in descending order. called by ECS when allocating floor requests, therefore not a slot
 
         friend class ECS;   //declare ECS a friend so ECS can call blockAllSignals(
 

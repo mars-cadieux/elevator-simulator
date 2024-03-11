@@ -88,12 +88,21 @@ void ECS::checkFloor()
     else if(destFloor<elevator->getCurrentFloor()){
         elevator->travel("down");
     }
-    //if we are at the dest floor, stop and call board() or emergencyStop() if it'a an emergency
+    //if we are at the dest floor, stop and call board() or emergencyStop() if it's an emergency
     else{
         if(elevator->getState() == "emergency"){
             elevator->emergencyStop();
         }
         else{
+            //check to see if this stop is an elevvator completing a floor request
+            std::list<FloorRequest*>::iterator end = floorRequests.end();
+            for(std::list<FloorRequest*>::iterator it = floorRequests.begin(); it != end; ++it){
+                if((*it)->eID == elevator->getID() && (*it)->floorNum == elevator->getCurrentFloor()){
+                    emit requestCompleted((*it)->floorNum, (*it)->direction);
+                    floorRequests.erase(it);
+                    break;
+                }
+            }
             elevator->board();
         }
     }
@@ -102,15 +111,47 @@ void ECS::checkFloor()
 void ECS::receiveRequest(int floor, const string &dir)
 {
     cout<<"floor "<<floor<<" "<<dir<<" requested"<<endl;
+    emit requestReceived(floor, dir);
 
     bool allocated = false;
 
+    //TODO: change to closest idle elevator
     for(unsigned int i=0; i<elevators.size(); ++i){
+        //allocate the request to first idle elevator we find
         if(elevators[i]->getState() == "idle"){
-            FloorRequest* newRequest = new FloorRequest(floor, elevators[i]->getID());
+            elevators[i]->addStopAsc(floor);
+            FloorRequest* newRequest = new FloorRequest(floor, dir, elevators[i]->getID());
             floorRequests.push_back(newRequest);
-            elevators[i]->addStop()
+            allocated = true;
+            break;
         }
+    }
+    //if we made it through the whole for loop and none of the elevators were idle, see if the floor making the request is on the same trajectory as one of the moving elevators
+    if(!allocated){
+        for(unsigned int i=0; i<elevators.size(); ++i){
+            //allocate the request to first idle elevator we find
+            if(elevators[i]->getState() == "travelling"){
+                if(elevators[i]->getTravelDirection() == "up" && floor > elevators[i]->getCurrentFloor()){
+                    elevators[i]->addStopAsc(floor);
+                    FloorRequest* newRequest = new FloorRequest(floor, dir, elevators[i]->getID());
+                    floorRequests.push_back(newRequest);
+                    allocated = true;
+                    break;
+                }
+                else if(elevators[i]->getTravelDirection() == "down" && floor < elevators[i]->getCurrentFloor()){
+                    elevators[i]->addStopDesc(floor);
+                    FloorRequest* newRequest = new FloorRequest(floor, dir, elevators[i]->getID());
+                    floorRequests.push_back(newRequest);
+                    allocated = true;
+                    break;
+                }
+            }
+        }
+    }
+    //if the request was still not able to be allocated, signal back that the request failed, and ask the floor button to make its request again
+    //we do this instead of using a while loop and just waiting until the request can be allocated so that the ECS isn't tied up by this while loop while other things are happening
+    if(!allocated){
+        emit requestFailed(floor, dir);
     }
 }
 
