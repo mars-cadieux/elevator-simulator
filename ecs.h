@@ -26,10 +26,6 @@ class ECS :  public QObject{
 
         friend class ECSThread;     //the allocation of requests function will operate on a separate thread since it is time consuming, this thread will need access to all of the ECS' private variables since it is doing the ECS' work
 
-        //void takeRequest();
-        void allocateRequest();		//Gives the request to the first elevator in the availableElevators vector. if the availableElevators vector is empty, check if any moving elevators can accommodate the request as a stop between their current floor and their destination
-        void update();
-
         void addElevator(Elevator* e);
 
     signals:
@@ -44,19 +40,15 @@ class ECS :  public QObject{
         void checkStops();
         void checkFloor();
         void receiveRequest(int floor, const string& dir);
-        void handleResults(QString s);
+        void handleResults(QString s);      //receive and print the result of the ECS thread (will be a string indicating which elevator the request was allocated to
 
     private:
-        //vector<FloorButton*> floorButtons;
         vector<Elevator*> elevators;
         list<FloorRequest*> floorRequests;
 
-        //vector<FloorButton*> floorRequests; 	//storing FloorButton pointers instead of making a FloorRequest object/class and storing those, since my FloorRequest object would just have a floorNum (int) and a direction (string), which the FloorButton already has.
-        //vector<Elevator*> availableElevators;
         QTimer timer;
 
         void reset();       //reset the simulation to normal after an emergency. this function is private as no other class should be allowed to reset the simulation without the ECS' permission
-        //Building* building; //pointer to the building
 
 };
 

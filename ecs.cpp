@@ -26,7 +26,7 @@ void ECS::powerOut()
     qInfo("Power outage. Starting backup  generator...");
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->removeAllStops();
-        elevators[i]->emergency("There is a power outage in the building. Please disembark once we have reached a safe floor.");
+        elevators[i]->emergency("Power outage in building. \nMoving to safe floor.");
     }
     //delete all floor requests
     while(floorRequests.size()>0){
@@ -43,7 +43,7 @@ void ECS::fire()
     qInfo("Fire in building. Beginning emergency protocol...");
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->removeAllStops();
-        elevators[i]->emergency("There is a fire in the building. Please disembark once we have reached a safe floor.");
+        elevators[i]->emergency("Fire in the building. \nMoving to safe floor.");
     }
     //delete all floor requests
     while(floorRequests.size()>0){
@@ -189,6 +189,7 @@ void ECS::reset()
         elevators[i]->unblockAllSignals();
         elevators[i]->closeDoor();
         elevators[i]->setState("idle");
+        elevators[i]->display->updateDisplay(elevators[i]->currentFloor);
         //TODO: update display iwht current floor num
     }
     emit simulationReset();

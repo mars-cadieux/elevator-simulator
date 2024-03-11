@@ -10,10 +10,13 @@ Elevator::Elevator(QObject *parent)
 {
     door = new Door(id);
     elevatorUI = new ElevatorUI(nullptr, this);
-    display = new Display(this);
+    display = new Display(nullptr, this);
     audioSystem = new AudioSystem(this);
 
     QObject::connect(&doorTimer, &QTimer::timeout, this, &Elevator::closeDoor);
+    QObject::connect(display, &Display::displayUpdated, elevatorUI, &ElevatorUI::updateDisplayLabel);
+
+    display->updateDisplay(currentFloor);
 }
 
 Elevator::~Elevator(){
@@ -150,7 +153,7 @@ void Elevator::emergencyStop()
     setState("emergency stopped");
     travelDirection = "";
     ringBell();
-    display->updateDisplay("Safe floor reached. Please disembark.");
+    display->updateDisplay("Safe floor reached. \nPlease disembark.");
     audioSystem->setMessage("We have reached the safe floor. Please disembark as soon as possible.");
     door->open();
 
@@ -250,8 +253,8 @@ void Elevator::closeDoor()
             qInfo("Weight capacity exceeded. Reopening door.");
             //open the door but don't start a timer, door will stay open indefinitely until weight has been reduced
             door->open();
-            display->updateDisplay("Weight capacity exceeded. Please reduce elevator load.");
-            audioSystem->setMessage("Weight capacity exceeded. Please reduce elevator load.");
+            display->updateDisplay("Weight limit exceeded. \nPlease reduce load.");
+            audioSystem->setMessage("Weight limit exceeded. Please reduce elevator load.");
         }
         else if(obstructed){
             setState("obstructed stopped");
@@ -259,7 +262,7 @@ void Elevator::closeDoor()
             openDoor();
             ++obstructedCount;
             if(obstructedCount >= 3){
-                display->updateDisplay("Door obstructed. Please clear door.");
+                display->updateDisplay("Door obstructed. \nPlease clear door.");
                 audioSystem->setMessage("The door is obstructed. Please clear the door of all obstacles.");
             }
         }
@@ -333,7 +336,7 @@ void Elevator::overloadToggle()
     if(!overload){
         display->updateDisplay(currentFloor);
     }
-    cout<<"Overload: "<<overload<<endl;
+    //cout<<"Overload: "<<overload<<endl;
 }
 
 void Elevator::obstructedToggle()
@@ -343,7 +346,7 @@ void Elevator::obstructedToggle()
     if(!obstructed){
         display->updateDisplay(currentFloor);
     }
-    cout<<"Obstructed: "<<obstructed<<endl;
+    //cout<<"Obstructed: "<<obstructed<<endl;
 }
 
 

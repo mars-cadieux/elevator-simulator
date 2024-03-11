@@ -23,8 +23,7 @@ SOURCES += \
     floorbutton.cpp \
     floorrequest.cpp \
     main.cpp \
-    mainwindow.cpp \
-    test.cpp
+    mainwindow.cpp
 
 HEADERS += \
     audiosystem.h \
@@ -41,8 +40,7 @@ HEADERS += \
     elevatorui.h \
     floorbutton.h \
     floorrequest.h \
-    mainwindow.h \
-    test.h
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui

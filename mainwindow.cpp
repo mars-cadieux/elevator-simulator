@@ -111,7 +111,7 @@ void MainWindow::resume()
 void MainWindow::on_powerOutButton_released()
 {
     emit powerOut();
-    for(int i=0; i<floorButtons.size(); ++i){
+    for(unsigned int i=0; i<floorButtons.size(); ++i){
         floorButtons[i]->darken();
     }
     //block all signals until the ECS tells us the simulation is good to be resumed
@@ -121,7 +121,7 @@ void MainWindow::on_powerOutButton_released()
 void MainWindow::on_fireButton_released()
 {
     emit fire();
-    for(int i=0; i<floorButtons.size(); ++i){
+    for(unsigned int i=0; i<floorButtons.size(); ++i){
         floorButtons[i]->darken();
     }
     //block all signals until the ECS tells us the simulation is good to be resumed
@@ -148,7 +148,7 @@ void MainWindow::delay(int seconds)
 
 void MainWindow::pendingRequest(int f, const string &dir)
 {
-    for(int i=0; i<floorButtons.size(); ++i){
+    for(unsigned int i=0; i<floorButtons.size(); ++i){
         if(floorButtons[i]->getFloorNum() == f && floorButtons[i]->getDirection() == dir){
             floorButtons[i]->illuminate();
         }
@@ -166,7 +166,7 @@ void MainWindow::failedRequest(int f, const std::string &dir)
 
 void MainWindow::completedRequest(int f, const std::string &dir)
 {
-    for(int i=0; i<floorButtons.size(); ++i){
+    for(unsigned int i=0; i<floorButtons.size(); ++i){
         if(floorButtons[i]->getFloorNum() == f && floorButtons[i]->getDirection() == dir){
             floorButtons[i]->darken();
         }

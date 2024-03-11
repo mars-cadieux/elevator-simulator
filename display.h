@@ -5,19 +5,24 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <QObject>
 
 class Elevator;
 
 using namespace std;
 
-class Display {
+class Display : public QObject{
+    Q_OBJECT
     public:
-        Display(Elevator* e); //constructor
+        explicit Display(QObject* parent = nullptr, Elevator* e = nullptr); //constructor
         ~Display(); //destructor
+
+        const string& getMessage() const;
 
         void updateDisplay(const string& message);
         void updateDisplay(int floorNum);
-
+    signals:
+        void displayUpdated();
     private:
         string currentMessage;
         Elevator* owner;

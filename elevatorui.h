@@ -24,7 +24,7 @@ public:
 signals:
 
 public slots:
-    void testFun();
+    void updateDisplayLabel();
 
 private:
     std::vector<ElevatorButton*> elevatorButtons;
@@ -33,6 +33,8 @@ private:
     QPushButton* helpButton;
 
     QFrame line;
+    QLabel userView;
+    QLabel display;
     QLabel safetyTests;
 
     QPushButton* obstructButton;

@@ -43,7 +43,7 @@ class Elevator : public QObject {
 
         //member functions
         void travel(const string& direction);	// initiates movement of the elevator in a particular direction and says 'while currentFloor != destinationFloor: keep moving'
-        void updateFloor(int currentFloor); //updates currentFloor
+        void updateFloor(int currentFloor); //updates currentFloor. this is effectively the floor sensor notifying the elevator that it is at a new floor
         void removeAllStops(); //removes all stops in list, used in emergency situations
         void emergency(const string& msg);
         void emergencyStop();
@@ -67,6 +67,8 @@ class Elevator : public QObject {
         void doorClosed();
         void stopAdded();
         void newFloor();
+        void overloadedSignal();
+        void obstructedSignal();
 
     public slots:
         void openDoor();

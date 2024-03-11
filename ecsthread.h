@@ -18,11 +18,11 @@ public:
 
 signals:
     void resultReady(const QString &s);
+
 private:
     ECS* ecs;
     int floor;          //floor of the request
     std::string dir;    //direction of the request
-
 };
 
 #endif // ECSTHREAD_H
