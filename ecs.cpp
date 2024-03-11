@@ -160,9 +160,9 @@ void ECS::receiveRequest(int floor, const string &dir)
     //    }
 }
 
-void ECS::handleResults()
+void ECS::handleResults(QString s)
 {
-    qInfo("test");
+    cout<<s.toStdString()<<endl;
 }
 
 void ECS::reset()

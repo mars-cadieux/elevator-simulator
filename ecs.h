@@ -52,7 +52,7 @@ class ECS :  public QObject{
         void checkStops();
         void checkFloor();
         void receiveRequest(int floor, const string& dir);
-        void handleResults();
+        void handleResults(QString s);
 
     private:
         //vector<FloorButton*> floorButtons;
