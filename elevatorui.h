@@ -6,6 +6,8 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QLabel>
+#include <QFrame>
 
 class Elevator;
 
@@ -29,7 +31,15 @@ private:
     QPushButton* openDoorButton;
     QPushButton* closeDoorButton;
     QPushButton* helpButton;
+
+    QFrame line;
+    QLabel safetyTests;
+
+    QPushButton* obstructButton;
+    QPushButton* overloadButton;
+
     Elevator* owner;        //pointer to the elevator that "owns" this UI
+
     void blockAllSignals();
     void unblockAllSignals();
 };

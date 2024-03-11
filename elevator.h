@@ -57,7 +57,7 @@ class Elevator : public QObject {
         void addStopAsc(int f);     //add stop in ascending order. called by ECS when allocating floor requests, therefore not a slot
         void addStopDesc(int f);    //add stop in descending order. called by ECS when allocating floor requests, therefore not a slot
 
-        friend class ECS;   //declare ECS a friend so ECS can call blockAllSignals(
+        friend class ECS;   //declare ECS a friend so ECS can call blockAllSignals()
 
 
     signals:
@@ -73,6 +73,8 @@ class Elevator : public QObject {
         void closeDoor();
         void callForHelp();
         void addStop();
+        void overloadToggle();
+        void obstructedToggle();
 
     private:
         const int id;
@@ -80,6 +82,9 @@ class Elevator : public QObject {
         string state;               //travelling, idle, boarding, emergency, overload stopped, obstructed stopped
         string travelDirection;     //up, down
         float weightLimit;
+        bool obstructed;
+        bool overload;
+        int obstructedCount;        //counter for how many times in a row the door has been obstructed while attempting to close, 3 times in a row wil result in a warning
         int currentFloor;
         std::list<int> stops;
 

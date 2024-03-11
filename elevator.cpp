@@ -6,7 +6,7 @@
 int Elevator::nextID = 0;
 
 Elevator::Elevator(QObject *parent)
-    : QObject{parent}, id(++nextID), state("idle"), weightLimit(250.00), currentFloor(1)
+    : QObject{parent}, id(++nextID), state("idle"), weightLimit(250.00), obstructed(false), overload(false), obstructedCount(0), currentFloor(1)
 {
     door = new Door(id);
     elevatorUI = new ElevatorUI(nullptr, this);
@@ -62,8 +62,9 @@ Door *Elevator::getDoor() const
 void Elevator::delay(int seconds)
 {
     QTime dieTime= QTime::currentTime().addSecs(seconds);
-    while (QTime::currentTime() < dieTime)
+    while (QTime::currentTime() < dieTime){
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
 }
 
 void Elevator::blockAllSignals()
@@ -242,11 +243,36 @@ void Elevator::openDoor()
 }
 
 void Elevator::closeDoor()
-{
+{   
     if(door->getState() != "closed"){
-        ringBell();
-        door->close();
-        emit doorClosed();
+        if(overload){
+            setState("overload stopped");
+            qInfo("Weight capacity exceeded. Reopening door.");
+            //open the door but don't start a timer, door will stay open indefinitely until weight has been reduced
+            door->open();
+            display->updateDisplay("Weight capacity exceeded. Please reduce elevator load.");
+            audioSystem->setMessage("Weight capacity exceeded. Please reduce elevator load.");
+        }
+        else if(obstructed){
+            setState("obstructed stopped");
+            qInfo("Door obstructed. Reopening door.");
+            openDoor();
+            ++obstructedCount;
+            if(obstructedCount >= 3){
+                display->updateDisplay("Door obstructed. Please clear door.");
+                audioSystem->setMessage("The door is obstructed. Please clear the door of all obstacles.");
+            }
+        }
+        else{
+            //if our elevator was previously ovverloaded or obstructed and is now able to close its doors again, set its state back to boarding
+            if(state == "overload stopped" || state == "obstructed stopped"){
+                setState("boarding");
+            }
+            ringBell();
+            door->close();
+            obstructedCount = 0;
+            emit doorClosed();
+        }
     }
 }
 
@@ -279,7 +305,7 @@ void Elevator::addStop()
                 }
             }
         }
-        //same thing but for whenn a stop is added while the elevator is moving down, and the stop is below the current floor
+        //same thing but for when a stop is added while the elevator is moving down, and the stop is below the current floor
         else if(state == "travelling" && travelDirection == "down" && floorNum < currentFloor){
             for(std::list<int>::iterator it = stops.begin(); it != end; ++it){
                 if(floorNum > *it){
@@ -296,8 +322,28 @@ void Elevator::addStop()
     else{
         stops.push_back(floorNum);
     }
-    printStops();   //TOODO: used for debugging, delete later
+    //printStops();   //used for debugging, feel free to un-comment if you'd like
     emit stopAdded();
+}
+
+void Elevator::overloadToggle()
+{
+    overload = !overload;
+    //if the elevator was overloaded and is no longer overloaded, remove warning message from display
+    if(!overload){
+        display->updateDisplay(currentFloor);
+    }
+    cout<<"Overload: "<<overload<<endl;
+}
+
+void Elevator::obstructedToggle()
+{
+    obstructed = !obstructed;
+    //if the elevator was obstructed and is no longer obstructed, remove warning message from display
+    if(!obstructed){
+        display->updateDisplay(currentFloor);
+    }
+    cout<<"Obstructed: "<<obstructed<<endl;
 }
 
 

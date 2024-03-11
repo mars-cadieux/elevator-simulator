@@ -24,15 +24,7 @@ class ECS :  public QObject{
         explicit ECS(QObject* parent = nullptr); // Constructor
         ~ECS(); // Destructor
 
-//        class FloorRequest{
-//            public:
-//                FloorRequest(int f, const string& dir, int id): floorNum(f), direction(dir), eID(id) {};
-//                int floorNum;
-//                string direction;
-//                int eID;    //id of the elevator that is taking the request
-//        };
-
-        friend class ECSThread;
+        friend class ECSThread;     //the allocation of requests function will operate on a separate thread since it is time consuming, this thread will need access to all of the ECS' private variables since it is doing the ECS' work
 
         //void takeRequest();
         void allocateRequest();		//Gives the request to the first elevator in the availableElevators vector. if the availableElevators vector is empty, check if any moving elevators can accommodate the request as a stop between their current floor and their destination
@@ -65,7 +57,7 @@ class ECS :  public QObject{
 
         void reset();       //reset the simulation to normal after an emergency. this function is private as no other class should be allowed to reset the simulation without the ECS' permission
         //Building* building; //pointer to the building
-        void addRequest(FloorRequest* r);
+
 };
 
 #endif

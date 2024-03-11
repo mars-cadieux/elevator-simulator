@@ -28,8 +28,14 @@ void ECS::powerOut()
         elevators[i]->removeAllStops();
         elevators[i]->emergency("There is a power outage in the building. Please disembark once we have reached a safe floor.");
     }
+    //delete all floor requests
+    while(floorRequests.size()>0){
+        FloorRequest* yeet = floorRequests.back();
+        floorRequests.pop_back();
+        delete yeet;
+    }
+    //start a timer to pause the simulation for 10 seconds
     timer.start(10000);
-    //cout<<"10 seconds until simulation returns to normal"<<endl;
 }
 
 void ECS::fire()
@@ -39,8 +45,14 @@ void ECS::fire()
         elevators[i]->removeAllStops();
         elevators[i]->emergency("There is a fire in the building. Please disembark once we have reached a safe floor.");
     }
+    //delete all floor requests
+    while(floorRequests.size()>0){
+        FloorRequest* yeet = floorRequests.back();
+        floorRequests.pop_back();
+        delete yeet;
+    }
+    //start a timer to pause the simulation for 10 seconds
     timer.start(10000);
-    //cout<<"10 seconds until simulation returns to normal"<<endl;
 }
 
 //this slot catches all signals emitted when an elevator closes its doors or when a stop is added
@@ -113,7 +125,10 @@ void ECS::checkFloor()
 void ECS::receiveRequest(int floor, const string &dir)
 {
     cout<<"floor "<<floor<<" "<<dir<<" requested"<<endl;
+    //this signal tells the floor button to illuminate
     emit requestReceived(floor, dir);
+
+    //make a new thread and offload the work of this function to said thread
 
     ECSThread* ecsThread = new ECSThread(this, this, floor, dir);
     QObject::connect(ecsThread, &ECSThread::resultReady, this, &ECS::handleResults);
@@ -162,6 +177,7 @@ void ECS::receiveRequest(int floor, const string &dir)
     //    }
 }
 
+//print the result of the ecs thread, will be a string indicating which elevator the request was allocated to
 void ECS::handleResults(QString s)
 {
     cout<<s.toStdString()<<endl;
@@ -173,11 +189,7 @@ void ECS::reset()
         elevators[i]->unblockAllSignals();
         elevators[i]->closeDoor();
         elevators[i]->setState("idle");
+        //TODO: update display iwht current floor num
     }
     emit simulationReset();
-}
-
-void ECS::addRequest(FloorRequest *r)
-{
-    floorRequests.push_back(r);
 }

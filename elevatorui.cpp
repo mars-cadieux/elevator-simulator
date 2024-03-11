@@ -5,6 +5,7 @@
 
 #include <QVBoxLayout>
 #include <QGridLayout>
+#include <QLabel>
 
 ElevatorUI::ElevatorUI(QWidget *parent, Elevator* e)
     : QWidget{parent}
@@ -17,6 +18,8 @@ ElevatorUI::ElevatorUI(QWidget *parent, Elevator* e)
 
     //create new grid layout, and dynamically generate buttons and add them to this layout
     QGridLayout *layout = new QGridLayout(this);
+
+    //TODO: label with display
 
     for(int i=1; i<=NUM_FLOORS; ++i){
         ElevatorButton *button = new ElevatorButton(i);
@@ -40,6 +43,26 @@ ElevatorUI::ElevatorUI(QWidget *parent, Elevator* e)
     helpButton = new QPushButton("Help");
     layout->addWidget(helpButton, std::ceil((NUM_FLOORS+3)/3), 2);
     QObject::connect(helpButton, SIGNAL(released()), owner, SLOT(callForHelp()));
+
+    //add a separator line and label for the safety test buttons
+    line.setObjectName(QString::fromUtf8("line"));
+    line.setGeometry(QRect(320, 150, 118, 3));
+    line.setFrameShape(QFrame::HLine);
+    line.setFrameShadow(QFrame::Sunken);
+
+    layout->setRowMinimumHeight(std::ceil((NUM_FLOORS+6)/3), 20);
+    layout->addWidget(&line, std::ceil((NUM_FLOORS+6)/3), 0, 1, 3);
+
+    safetyTests.setText("Safety Tests");
+    layout->addWidget(&safetyTests, std::ceil((NUM_FLOORS+9)/3), 0, 1, 3, Qt::AlignCenter);
+
+    obstructButton = new QPushButton("Door Obstruction");
+    layout->addWidget(obstructButton, std::ceil((NUM_FLOORS+12)/3), 0, 1, 3);
+    QObject::connect(obstructButton, SIGNAL(released()), owner, SLOT(obstructedToggle()));
+
+    overloadButton = new QPushButton("Overload");
+    layout->addWidget(overloadButton, std::ceil((NUM_FLOORS+15)/3), 0, 1, 3);
+    QObject::connect(overloadButton, SIGNAL(released()), owner, SLOT(overloadToggle()));
 }
 
 //ElevatorUI::ElevatorUI(Elevator* e){
@@ -63,6 +86,11 @@ ElevatorUI::~ElevatorUI()
         delete elevatorButtons[i];
     }
     elevatorButtons.clear();
+    delete openDoorButton;
+    delete closeDoorButton;
+    delete helpButton;
+    delete obstructButton;
+    delete overloadButton;
 }
 
 void ElevatorUI::testFun()
@@ -78,6 +106,8 @@ void ElevatorUI::blockAllSignals()
     openDoorButton->blockSignals(true);
     closeDoorButton->blockSignals(true);
     helpButton->blockSignals(true);
+    obstructButton->blockSignals(true);
+    overloadButton->blockSignals(true);
 }
 
 void ElevatorUI::unblockAllSignals()
@@ -88,4 +118,6 @@ void ElevatorUI::unblockAllSignals()
     openDoorButton->blockSignals(false);
     closeDoorButton->blockSignals(false);
     helpButton->blockSignals(false);
+    obstructButton->blockSignals(false);
+    overloadButton->blockSignals(false);
 }
