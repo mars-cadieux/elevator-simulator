@@ -37,6 +37,8 @@ void Controller::launch()
         QObject::connect(&(*elevators[i]), &Elevator::doorClosed, &ecs, &ECS::checkStops, Qt::QueuedConnection);
         QObject::connect(&(*elevators[i]), &Elevator::stopAdded, &ecs, &ECS::checkStops, Qt::QueuedConnection);
         QObject::connect(&(*elevators[i]), &Elevator::newFloor, &ecs, &ECS::checkFloor, Qt::QueuedConnection);
+        QObject::connect(&(*elevators[i]), &Elevator::onFire, &ecs, &ECS::elevatorFire, Qt::QueuedConnection);
+        QObject::connect(&(*elevators[i]), &Elevator::helpSignal, &ecs, &ECS::elevatorEmergency, Qt::QueuedConnection);
     }
 
     //connect the slots and signals for the emergency procedures

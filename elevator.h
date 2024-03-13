@@ -56,27 +56,31 @@ class Elevator : public QObject {
         void printStops();
         void addStopAsc(int f);     //add stop in ascending order. called by ECS when allocating floor requests, therefore not a slot
         void addStopDesc(int f);    //add stop in descending order. called by ECS when allocating floor requests, therefore not a slot
+        bool helpPassenger();
 
         friend class ECS;   //declare ECS a friend so ECS can call blockAllSignals()
 
 
     signals:
         void stop();
-        //void callBuilding(int eID);
         void callBuilding();
+        void helpSignal();
         void doorClosed();
         void stopAdded();
         void newFloor();
         void overloadedSignal();
         void obstructedSignal();
+        void onFire();
 
     public slots:
         void openDoor();
+        void openDoorFromGUI();     //calls openDoor() on a loop if  button is held down. openDoor() is sometimes called by the ECS which is why I have this as a separate slot
         void closeDoor();
         void callForHelp();
         void addStop();
         void overloadToggle();
         void obstructedToggle();
+        void fire();
 
     private:
         const int id;

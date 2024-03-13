@@ -19,13 +19,13 @@ class Building : public QObject{
         explicit Building(QObject* parent = nullptr);
 
     signals:
-        void noResponse(int eID);
 
     public slots:
-        //void respondCall(int eID);
         void respondCall();
+        void call911();
 
     private:
+        void delay(int seconds);    //adds a 5 second delay in the scenario where the building safety service does not respond
 };
 
 #endif // BUILDING_H

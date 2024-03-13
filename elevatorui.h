@@ -39,6 +39,7 @@ private:
 
     QPushButton* obstructButton;
     QPushButton* overloadButton;
+    QPushButton* fireButton;
 
     Elevator* owner;        //pointer to the elevator that "owns" this UI
 

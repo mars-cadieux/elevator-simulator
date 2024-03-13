@@ -36,7 +36,9 @@ class ECS :  public QObject{
 
     public slots:
         void powerOut();
-        void fire();
+        void fire();                //slot for when the building itself is on fire
+        void elevatorFire();        //slot for when a a single elevator is on fire
+        void elevatorEmergency();   //slot for when an elevator calls for help
         void checkStops();
         void checkFloor();
         void receiveRequest(int floor, const string& dir);
@@ -46,10 +48,11 @@ class ECS :  public QObject{
         vector<Elevator*> elevators;
         list<FloorRequest*> floorRequests;
 
-        QTimer timer;
+        QTimer* timer;
+        QTimer* singleTimer;
 
         void reset();       //reset the simulation to normal after an emergency. this function is private as no other class should be allowed to reset the simulation without the ECS' permission
-
+        void resetSingleElevator();       //reset an elevator to normal after an emergency
 };
 
 #endif

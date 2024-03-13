@@ -49,6 +49,7 @@ int Elevator::getID() const{
 void Elevator::setState(const string &s)
 {
     state = s;
+    //cout<<state<<endl;
 }
 
 list<int> Elevator::getStops() const
@@ -124,12 +125,6 @@ void Elevator::emergency(const string &msg)
     display->updateDisplay(msg);
     audioSystem->setMessage(msg);
 
-    //stops.push_back(currentFloor);
-
-    //
-    //stops.pop_front();
-    //delay();
-
     if(state == "travelling"){
         if(travelDirection == "up"){
             stops.push_back(currentFloor+1);
@@ -143,8 +138,6 @@ void Elevator::emergency(const string &msg)
         emit stopAdded();
     }
     setState("emergency");
-
-//
 }
 
 void Elevator::emergencyStop()
@@ -230,8 +223,13 @@ void Elevator::addStopDesc(int f)
     emit stopAdded();
 }
 
-void Elevator::openDoor()
+bool Elevator::helpPassenger()
 {
+    return PASSENGER_RESPOND;
+}
+
+void Elevator::openDoor()
+{    
     if(state != "travelling"){
         //if the door is not open, open it and set timer for 10 seconds. if door is already open, reset timer to 10 seconds
         if(door->getState() != "open"){
@@ -242,6 +240,17 @@ void Elevator::openDoor()
     }
     else{
         cout<<"Cannot open door while travelling."<<endl;
+    }
+}
+
+void Elevator::openDoorFromGUI()
+{
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+
+    //keep re-opening door every 1 second while the  open door button is held down
+    while(button->isDown()){
+        openDoor();
+        delay(1);
     }
 }
 
@@ -284,6 +293,7 @@ void Elevator::callForHelp()
 {
     cout<<"Calling building safety service..."<<endl;
     emit callBuilding();
+    emit helpSignal();
 }
 
 //this slot catches signals emitted when an elevator button is pressed
@@ -325,7 +335,7 @@ void Elevator::addStop()
     else{
         stops.push_back(floorNum);
     }
-    //printStops();   //used for debugging, feel free to un-comment if you'd like
+    printStops();   //used for debugging, feel free to un-comment if you'd like
     emit stopAdded();
 }
 
@@ -349,8 +359,12 @@ void Elevator::obstructedToggle()
     //cout<<"Obstructed: "<<obstructed<<endl;
 }
 
-
-
+void Elevator::fire()
+{
+    setState("fire");
+    elevatorUI->blockAllSignals();
+    emit onFire();
+}
 
 void Elevator::call911()
 {

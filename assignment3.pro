@@ -14,7 +14,6 @@ SOURCES += \
     controller.cpp \
     display.cpp \
     door.cpp \
-    doorsensor.cpp \
     ecs.cpp \
     ecsthread.cpp \
     elevator.cpp \
@@ -32,7 +31,6 @@ HEADERS += \
     defs.h \
     display.h \
     door.h \
-    doorsensor.h \
     ecs.h \
     ecsthread.h \
     elevator.h \

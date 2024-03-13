@@ -3,8 +3,9 @@
 ECS::ECS(QObject *parent)
     : QObject{parent}
 {
-    //connect the 10 second timer to the reset function so that the simulation can go back to normal after an emergency scenario
-    QObject::connect(&timer, &QTimer::timeout, this, &ECS::reset);
+
+
+
 }
 
 ECS::~ECS()
@@ -23,6 +24,10 @@ void ECS::addElevator(Elevator *e)
 
 void ECS::powerOut()
 {
+    timer = new QTimer(this);
+    //connect the 10 second timer to the reset function so that the simulation can go back to normal after an emergency scenario
+    QObject::connect(timer, &QTimer::timeout, this, &ECS::reset);
+
     qInfo("Power outage. Starting backup  generator...");
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->removeAllStops();
@@ -35,11 +40,15 @@ void ECS::powerOut()
         delete yeet;
     }
     //start a timer to pause the simulation for 10 seconds
-    timer.start(10000);
+    timer->start(10000);
 }
 
 void ECS::fire()
-{
+{   
+    timer = new QTimer(this);
+    //connect the 10 second timer to the reset function so that the simulation can go back to normal after an emergency scenario
+    QObject::connect(timer, &QTimer::timeout, this, &ECS::reset);
+
     qInfo("Fire in building. Beginning emergency protocol...");
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->removeAllStops();
@@ -52,7 +61,53 @@ void ECS::fire()
         delete yeet;
     }
     //start a timer to pause the simulation for 10 seconds
-    timer.start(10000);
+    timer->start(10000);
+}
+
+void ECS::elevatorFire()
+{
+    singleTimer = new QTimer(this);
+    QObject::connect(singleTimer, &QTimer::timeout, this, &ECS::resetSingleElevator);
+
+    Elevator* elevator = qobject_cast<Elevator*>(sender());
+    string eID = to_string(elevator->getID());
+    string msg = "Fire in elevator " + eID + ". Beginning emergency protocol...";
+    qInfo(msg.c_str());
+    elevator->removeAllStops();
+    elevator->emergency("Fire detected. \nMoving to safe floor.");
+
+    //start a timer to pause the simulation for 10 seconds
+    singleTimer->start(10000);
+}
+
+void ECS::elevatorEmergency()
+{
+    singleTimer = new QTimer(this);
+    QObject::connect(singleTimer, &QTimer::timeout, this, &ECS::resetSingleElevator);
+
+    Elevator* elevator = qobject_cast<Elevator*>(sender());
+    string eID = to_string(elevator->getID());
+    string msg = "Elevator " + eID + " has called for help.";
+    qInfo(msg.c_str());
+    elevator->removeAllStops();
+//    if(elevator->state == "travelling"){
+//        if(elevator->travelDirection == "up"){
+//            elevator->stops.push_back(elevator->currentFloor+1);
+//        }
+//        else if(elevator->travelDirection == "down"){
+//            elevator->stops.push_back(elevator->currentFloor-1);
+//        }
+//    }
+//    else{
+//        elevator->stops.push_back(elevator->currentFloor);
+//    }
+    elevator->setState("emergency stopped");
+    elevator->blockAllSignals();
+    string msg2 = "Elevator " + eID + " has been stopped.  10  seconds  until elevator " + eID + " returns to normal.";
+    qInfo(msg2.c_str());
+
+    //start a timer to pause the simulation for 10 seconds
+    singleTimer->start(10000);
 }
 
 //this slot catches all signals emitted when an elevator closes its doors or when a stop is added
@@ -76,12 +131,23 @@ void ECS::checkStops()
                     elevator->emergencyStop();
                 }
                 else{
+                    //check to see if this stop is an elevator completing a floor request
+                    std::list<FloorRequest*>::iterator end = floorRequests.end();
+                    for(std::list<FloorRequest*>::iterator it = floorRequests.begin(); it != end; ++it){
+                        if((*it)->eID == elevator->getID() && (*it)->floorNum == elevator->getCurrentFloor()){
+                            emit requestCompleted((*it)->floorNum, (*it)->direction);
+                            FloorRequest* yeet = *it;
+                            floorRequests.erase(it);
+                            delete yeet;
+                            break;
+                        }
+                    }
                     elevator->board();
                 }
             }
         }
     }
-    else{
+    else if(elevator->getState() != "emergency stopped"){
         elevator->setState("idle");
     }
 }
@@ -129,52 +195,10 @@ void ECS::receiveRequest(int floor, const string &dir)
     emit requestReceived(floor, dir);
 
     //make a new thread and offload the work of this function to said thread
-
     ECSThread* ecsThread = new ECSThread(this, this, floor, dir);
     QObject::connect(ecsThread, &ECSThread::resultReady, this, &ECS::handleResults);
     QObject::connect(ecsThread, &ECSThread::finished, ecsThread, &QObject::deleteLater);
     ecsThread->start();
-
-//    bool allocated = false;
-
-//    //TODO: change to closest idle elevator
-//    for(unsigned int i=0; i<elevators.size(); ++i){
-//        //allocate the request to first idle elevator we find
-//        if(elevators[i]->getState() == "idle"){
-//            elevators[i]->addStopAsc(floor);
-//            FloorRequest* newRequest = new FloorRequest(floor, dir, elevators[i]->getID());
-//            floorRequests.push_back(newRequest);
-//            allocated = true;
-//            break;
-//        }
-//    }
-//    //if we made it through the whole for loop and none of the elevators were idle, see if the floor making the request is on the same trajectory as one of the moving elevators
-//    if(!allocated){
-//        for(unsigned int i=0; i<elevators.size(); ++i){
-//            //allocate the request to first idle elevator we find
-//            if(elevators[i]->getState() == "travelling"){
-//                if(elevators[i]->getTravelDirection() == "up" && floor > elevators[i]->getCurrentFloor()){
-//                    elevators[i]->addStopAsc(floor);
-//                    FloorRequest* newRequest = new FloorRequest(floor, dir, elevators[i]->getID());
-//                    floorRequests.push_back(newRequest);
-//                    allocated = true;
-//                    break;
-//                }
-//                else if(elevators[i]->getTravelDirection() == "down" && floor < elevators[i]->getCurrentFloor()){
-//                    elevators[i]->addStopDesc(floor);
-//                    FloorRequest* newRequest = new FloorRequest(floor, dir, elevators[i]->getID());
-//                    floorRequests.push_back(newRequest);
-//                    allocated = true;
-//                    break;
-//                }
-//            }
-//        }
-//    }
-//    //if the request was still not able to be allocated, signal back that the request failed, and ask the floor button to make its request again
-//    //we do this instead of using a while loop and just waiting until the request can be allocated so that the ECS isn't tied up by this while loop while other things are happening
-//    if(!allocated){
-//        emit requestFailed(floor, dir);
-    //    }
 }
 
 //print the result of the ecs thread, will be a string indicating which elevator the request was allocated to
@@ -185,12 +209,29 @@ void ECS::handleResults(QString s)
 
 void ECS::reset()
 {
+    //cout<<"in reset"<<endl;
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->unblockAllSignals();
         elevators[i]->closeDoor();
         elevators[i]->setState("idle");
         elevators[i]->display->updateDisplay(elevators[i]->currentFloor);
-        //TODO: update display iwht current floor num
     }
+    delete timer;
     emit simulationReset();
+}
+
+void ECS::resetSingleElevator()
+{
+    //cout<<"here?"<<endl;
+    for(unsigned int i=0; i<elevators.size(); ++i){
+        if(elevators[i]->getState() == "emergency stopped"){
+            //cout<<"here"<<endl;
+            elevators[i]->unblockAllSignals();
+            elevators[i]->closeDoor();
+            elevators[i]->setState("idle");
+            elevators[i]->display->updateDisplay(elevators[i]->currentFloor);
+            break;
+        }
+    }
+    delete singleTimer;
 }

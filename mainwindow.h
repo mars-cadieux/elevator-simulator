@@ -44,8 +44,8 @@ class MainWindow : public QMainWindow
         void completedRequest(int f, const std::string& dir);
 
     private slots:
-        void on_powerOutButton_released();
-        void on_fireButton_released();
+        void powerOutButton_released();
+        void fireButton_released();
         void floorButtonReleased();
 
 };

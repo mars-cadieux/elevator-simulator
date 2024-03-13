@@ -54,7 +54,7 @@ ElevatorUI::ElevatorUI(QWidget *parent, Elevator* e)
     openDoorButton = new QPushButton("<|>");
     openDoorButton->setStyleSheet("background-color: rgb(217, 178,237)");
     layout->addWidget(openDoorButton, std::ceil((NUM_FLOORS+3*rowOffset)/3), 0);
-    QObject::connect(openDoorButton, SIGNAL(released()), owner, SLOT(openDoor()));
+    QObject::connect(openDoorButton, SIGNAL(pressed()), owner, SLOT(openDoorFromGUI()));
 
     closeDoorButton = new QPushButton(">|<");
     closeDoorButton->setStyleSheet("background-color: rgb(217, 178,237)");
@@ -91,6 +91,11 @@ ElevatorUI::ElevatorUI(QWidget *parent, Elevator* e)
     overloadButton->setCheckable(true);
     layout->addWidget(overloadButton, std::ceil((NUM_FLOORS+3*rowOffset)/3), 0, 1, 3);
     QObject::connect(overloadButton, SIGNAL(released()), owner, SLOT(overloadToggle()));
+    rowOffset++;
+
+    fireButton = new QPushButton("Fire");
+    layout->addWidget(fireButton, std::ceil((NUM_FLOORS+3*rowOffset)/3), 0, 1, 3);
+    QObject::connect(fireButton, SIGNAL(released()), owner, SLOT(fire()));
     rowOffset++;
 }
 

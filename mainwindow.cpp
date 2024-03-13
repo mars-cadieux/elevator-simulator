@@ -72,13 +72,13 @@ MainWindow::MainWindow(QWidget *parent)
     layout->setColumnMinimumWidth(2, 50);
     layout->addWidget(powerOutButton, NUM_FLOORS*3/2, 2, Qt::AlignRight);
 
-    connect(powerOutButton, SIGNAL(released()), this, SLOT (on_powerOutButton_released()));
+    connect(powerOutButton, SIGNAL(released()), this, SLOT (powerOutButton_released()));
 
     //add the fire button and connect it to its slot
     QPushButton* fireButton = new QPushButton("Fire", this);
     layout->addWidget(fireButton, NUM_FLOORS*3/2 + 1, 2, Qt::AlignRight);
 
-    connect(fireButton, SIGNAL(released()), this, SLOT (on_fireButton_released()));
+    connect(fireButton, SIGNAL(released()), this, SLOT (fireButton_released()));
 
     //now add the grid layout to a new widget and set the central widget of MainWindow to this new widget
     QWidget *window = new QWidget(this);
@@ -108,7 +108,7 @@ void MainWindow::resume()
 
 
 
-void MainWindow::on_powerOutButton_released()
+void MainWindow::powerOutButton_released()
 {
     emit powerOut();
     for(unsigned int i=0; i<floorButtons.size(); ++i){
@@ -118,7 +118,7 @@ void MainWindow::on_powerOutButton_released()
     this->blockSignals(true);
 }
 
-void MainWindow::on_fireButton_released()
+void MainWindow::fireButton_released()
 {
     emit fire();
     for(unsigned int i=0; i<floorButtons.size(); ++i){
