@@ -155,15 +155,6 @@ void MainWindow::pendingRequest(int f, const string &dir)
     }
 }
 
-//if a floor button's request has failed, it should wait 1 second then make its request again
-//we wait 1 second so we don't overload the ECS
-void MainWindow::failedRequest(int f, const std::string &dir)
-{
-    qInfo("request failed");
-    delay(1);
-    emit floorButtonPressed(f, dir);
-}
-
 void MainWindow::completedRequest(int f, const std::string &dir)
 {
     for(unsigned int i=0; i<floorButtons.size(); ++i){

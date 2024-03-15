@@ -5,11 +5,9 @@
 #include <QTimer>
 #include <QThread>
 
-//#include "FloorButton.h"
 #include "elevator.h"
 #include "floorrequest.h"
 #include "ecsthread.h"
-//#include "Building.h"
 
 #include <iostream>
 #include <string>
@@ -49,7 +47,7 @@ class ECS :  public QObject{
         list<FloorRequest*> floorRequests;
 
         QTimer* timer;
-        QTimer* singleTimer;
+        list<QTimer*> singleTimers;
 
         void reset();       //reset the simulation to normal after an emergency. this function is private as no other class should be allowed to reset the simulation without the ECS' permission
         void resetSingleElevator();       //reset an elevator to normal after an emergency

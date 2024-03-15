@@ -335,7 +335,7 @@ void Elevator::addStop()
     else{
         stops.push_back(floorNum);
     }
-    printStops();   //used for debugging, feel free to un-comment if you'd like
+    //printStops();   //used for debugging, feel free to un-comment if you'd like
     emit stopAdded();
 }
 

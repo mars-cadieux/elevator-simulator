@@ -6,7 +6,7 @@
 
 class ECS;
 
-//this class is a thread for the ECCS to offload request allocation to so it isn't tied up if a request takes a while to allocate
+//this class is a thread for the ECS to offload request allocation to so it isn't tied up if a request takes a while to allocate
 class ECSThread : public QThread
 {
     Q_OBJECT

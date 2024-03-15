@@ -23,6 +23,7 @@ public:
 signals:
 
 private:
+    string state;
     int floorNum;
     string direction;
 };

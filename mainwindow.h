@@ -40,7 +40,6 @@ class MainWindow : public QMainWindow
     public slots:
         void resume();   //unblocks all signals
         void pendingRequest(int f, const std::string& dir);
-        void failedRequest(int f, const std::string& dir);
         void completedRequest(int f, const std::string& dir);
 
     private slots:

@@ -5,14 +5,10 @@
 #include <QTimer>
 
 #include "door.h"
-//#include "WeightSensor.h"
-#include "doorsensor.h"
 #include "building.h"
 #include "display.h"
 #include "audiosystem.h"
-//#include "FloorSensor.h"
 #include "elevatorui.h"
-//#include "ecs.h"
 
 #include <iostream>
 #include <string>
@@ -50,8 +46,6 @@ class Elevator : public QObject {
         void showUI();  //calls show() on elevatorUI object, needed since controller does not have direct access to elevatorUI object
         void call911(); //places a 911 call if there is no response from building after callForHelp() is called
         void ringBell();
-        //bool obstructedStop();
-        //bool overloadStop();
         void board();
         void printStops();
         void addStopAsc(int f);     //add stop in ascending order. called by ECS when allocating floor requests, therefore not a slot
@@ -59,7 +53,6 @@ class Elevator : public QObject {
         bool helpPassenger();
 
         friend class ECS;   //declare ECS a friend so ECS can call blockAllSignals()
-
 
     signals:
         void stop();
@@ -85,7 +78,7 @@ class Elevator : public QObject {
     private:
         const int id;
         static int nextID;
-        string state;               //travelling, idle, boarding, emergency, overload stopped, obstructed stopped
+        string state;               //travelling, idle, boarding, emergency, emergency stopped, overload stopped, obstructed stopped
         string travelDirection;     //up, down
         float weightLimit;
         bool obstructed;
@@ -98,10 +91,6 @@ class Elevator : public QObject {
         Door* door;
         Display* display;
         AudioSystem* audioSystem;
-        //WeightSensor weightSensor;
-        DoorSensor* doorSensor;
-        //FloorSensor floorSensor;
-        Building* building; //pointer to the building that contains the elevator
 
         QTimer doorTimer;   //timer to close the door after 10 seconds
 

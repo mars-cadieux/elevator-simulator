@@ -66,7 +66,8 @@ void ECS::fire()
 
 void ECS::elevatorFire()
 {
-    singleTimer = new QTimer(this);
+    QTimer* singleTimer = new QTimer(this);
+    singleTimers.push_back(singleTimer);
     QObject::connect(singleTimer, &QTimer::timeout, this, &ECS::resetSingleElevator);
 
     Elevator* elevator = qobject_cast<Elevator*>(sender());
@@ -82,7 +83,8 @@ void ECS::elevatorFire()
 
 void ECS::elevatorEmergency()
 {
-    singleTimer = new QTimer(this);
+    QTimer* singleTimer = new QTimer(this);
+    singleTimers.push_back(singleTimer);
     QObject::connect(singleTimer, &QTimer::timeout, this, &ECS::resetSingleElevator);
 
     Elevator* elevator = qobject_cast<Elevator*>(sender());
@@ -209,7 +211,6 @@ void ECS::handleResults(QString s)
 
 void ECS::reset()
 {
-    //cout<<"in reset"<<endl;
     for(unsigned int i=0; i<elevators.size(); ++i){
         elevators[i]->unblockAllSignals();
         elevators[i]->closeDoor();
@@ -222,10 +223,8 @@ void ECS::reset()
 
 void ECS::resetSingleElevator()
 {
-    //cout<<"here?"<<endl;
     for(unsigned int i=0; i<elevators.size(); ++i){
         if(elevators[i]->getState() == "emergency stopped"){
-            //cout<<"here"<<endl;
             elevators[i]->unblockAllSignals();
             elevators[i]->closeDoor();
             elevators[i]->setState("idle");
@@ -233,5 +232,7 @@ void ECS::resetSingleElevator()
             break;
         }
     }
-    delete singleTimer;
+    QTimer* yeet = singleTimers.front();
+    singleTimers.pop_front();
+    delete yeet;
 }

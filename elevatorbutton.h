@@ -18,7 +18,6 @@ signals:
 
 private:
     int floorNum;
-
 };
 
 #endif // ELEVATORBUTTON_H
